@@ -31,7 +31,7 @@ body {
 .container {
     max-width: 900px;
     margin: 0 auto;
-    padding: 3rem 2rem;
+    padding: 7rem 7rem;
 }
 
 /* Typography */
@@ -113,6 +113,7 @@ p {
     object-fit: cover;
     filter: none;
     transition: opacity 0.3s ease, transform 0.3s ease;
+    display: block;
 }
 
 .profile-pic-wrap:hover .profile-pic {
@@ -242,6 +243,7 @@ section:last-of-type {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    margin-top: 1.25rem;
 }
 
 .project-card:hover {
@@ -399,11 +401,7 @@ section:last-of-type {
 
 /* Additional Projects */
 .additional-projects {
-    margin-top: 2rem;
-}
-
-.additional-projects .project-card {
-    margin-bottom: 2rem;
+    margin-top: 1.25rem;
 }
 
 .additional-projects .project-card:last-child {
@@ -599,9 +597,15 @@ footer {
         font-size: 1.5rem;
     }
     
+    /* Size the wrapper on mobile, let the img fill it */
+    .profile-pic-wrap {
+        width: 120px;
+        height: 120px;
+    }
+    /* Remove any image-level fixed sizing that could fight object-fit */
     .profile-pic {
-        width: 100px;
-        height: 100px;
+        width: 100%;
+        height: 100%;
     }
     
     .company-logos {
@@ -759,6 +763,20 @@ footer {
     text-align: center;
     padding: 2rem 0;
     margin-top: 2rem;
+}
+
+@media (hover: none), (pointer: coarse) {
+    .profile-pic-wrap {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
+    }
+    .profile-pic-wrap::before {
+        background: transparent !important;
+    }
+    .profile-pic {
+        opacity: 1 !important;
+        transform: none !important;
+    }
 }
 
 
