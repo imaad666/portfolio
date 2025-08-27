@@ -225,23 +225,58 @@ function setupScrollProgress() {
 // Initialize scroll progress
 setupScrollProgress();
 
-// Glass Button Displacement Map
+// Glass Button Displacement Map and circular favicon
 document.addEventListener('DOMContentLoaded', () => {
-    const feImage = document.querySelector("feImage");
+    const feImage = document.querySelector('feImage');
     if (feImage) {
-        fetch("https://essykings.github.io/JavaScript/map.png")
-            .then((response) => {
-                return response.blob();
-            })
+        fetch('https://essykings.github.io/JavaScript/map.png')
+            .then((response) => response.blob())
             .then((blob) => {
                 const objURL = URL.createObjectURL(blob);
-                feImage.setAttribute("href", objURL);
+                feImage.setAttribute('href', objURL);
             })
             .catch((error) => {
                 console.log('Could not load displacement map:', error);
             });
     }
-    
+
+    // Build a circular PNG favicon from the profile photo at runtime
+    function setCircularFavicon(src) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const size = 64;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, size, size);
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+            ctx.drawImage(img, 0, 0, size, size);
+            const url = canvas.toDataURL('image/png');
+            let link = document.querySelector('link[rel="icon"]');
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.type = 'image/png';
+            link.href = url;
+            let shortcut = document.querySelector('link[rel="shortcut icon"]');
+            if (shortcut) {
+                shortcut.type = 'image/png';
+                shortcut.href = url;
+            }
+        };
+        // cache-bust the source
+        img.src = src + (src.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    }
+
+    setCircularFavicon('assets/profile.jpg');
+
     // Glass Button Scroll to Top Functionality
     const glassButton = document.querySelector('.glass-button');
     if (glassButton) {
