@@ -15,7 +15,8 @@ function showMore() {
         }
     }
 }
-
+//vercel 
+import { SpeedInsights } from "@vercel/speed-insights/next"
 function showLess() {
     const additionalProjects = document.getElementById('additionalProjects');
     const viewMoreContainer = document.querySelector('.view-more-container');
