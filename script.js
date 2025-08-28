@@ -1,4 +1,16 @@
 // Portfolio Website JavaScript
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
+function MyApp({ Component, pageProps }) {
+  return (
+    <>
+      <Component {...pageProps} />
+      <SpeedInsights />
+    </>
+  );
+}
+ 
+export default MyApp;
 
 // View More/Less Projects Functionality
 function showMore() {
@@ -15,8 +27,6 @@ function showMore() {
         }
     }
 }
-//vercel 
-import { SpeedInsights } from "@vercel/speed-insights/next"
 function showLess() {
     const additionalProjects = document.getElementById('additionalProjects');
     const viewMoreContainer = document.querySelector('.view-more-container');
