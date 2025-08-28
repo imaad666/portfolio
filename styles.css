@@ -213,6 +213,32 @@ section:last-of-type {
 
 .marquee-item i {
     font-size: 2rem;
+    line-height: 1;
+}
+
+/* Normalize Bootstrap Icons size to match FA */
+.marquee-item .bi {
+    font-size: 1.8rem;
+    line-height: 1;
+    display: inline-block;
+}
+
+/* Extra fine-tune for TypeScript specifically */
+.marquee-item .bi-typescript {
+    font-size: 1.7rem;
+}
+
+/* Ensure SVG icons (e.g., TypeScript) match FA icon size */
+.marquee-item svg,
+.marquee-item .ts-icon {
+    width: 2rem;
+    height: 2rem;
+    display: block;
+}
+
+.marquee-item .ts-icon {
+    width: 1.6rem;
+    height: 1.6rem;
 }
 
 .marquee-item span {
@@ -778,5 +804,3 @@ footer {
         transform: none !important;
     }
 }
-
-
