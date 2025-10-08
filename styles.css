@@ -8,6 +8,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 @font-face {
     font-family: 'Paperlogy';
     src: url('assets/Paperlogy-5Medium.ttf') format('truetype');
@@ -15,6 +16,7 @@
     font-style: normal;
     font-display: swap;
 }
+
 * {
     margin: 0;
     padding: 0;
@@ -35,7 +37,9 @@ body {
 }
 
 /* Typography */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
     font-weight: 500;
     line-height: 1.2;
 }
@@ -99,12 +103,10 @@ p {
 }
 
 .profile-pic-wrap:hover::before {
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.12) 0%,
-        rgba(255, 255, 255, 0.06) 50%,
-        rgba(255, 255, 255, 0.03) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.06) 50%,
+            rgba(255, 255, 255, 0.03) 100%);
 }
 
 .profile-pic {
@@ -252,8 +254,13 @@ section:last-of-type {
 }
 
 @keyframes marquee-scroll {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
 }
 
 /* Projects Section */
@@ -316,6 +323,14 @@ section:last-of-type {
     height: 16px;
     text-decoration: none;
     color: transparent;
+}
+
+.eth-showcase-icon {
+    transition: all 0.3s ease;
+}
+
+.project-card:hover .eth-showcase-icon path {
+    fill: #ffffff;
 }
 
 .canvas-globe {
@@ -493,12 +508,10 @@ section:last-of-type {
     margin: 2rem 0;
     padding: 2rem;
     border-radius: 16px;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.1) 0%,
+            rgba(255, 255, 255, 0.05) 50%,
+            rgba(255, 255, 255, 0.02) 100%);
     border: 2px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: url(#glass);
 }
@@ -511,12 +524,10 @@ section:last-of-type {
     padding: 1rem;
     border-radius: 8px;
     transition: all 0.3s ease;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0.04) 50%,
-        rgba(255, 255, 255, 0.02) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(255, 255, 255, 0.04) 50%,
+            rgba(255, 255, 255, 0.02) 100%);
     border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
@@ -614,39 +625,40 @@ footer {
     .container {
         padding: 1rem;
     }
-    
+
     h1 {
         font-size: 2rem;
     }
-    
+
     h2 {
         font-size: 1.5rem;
     }
-    
+
     /* Size the wrapper on mobile, let the img fill it */
     .profile-pic-wrap {
         width: 120px;
         height: 120px;
     }
+
     /* Remove any image-level fixed sizing that could fight object-fit */
     .profile-pic {
         width: 100%;
         height: 100%;
     }
-    
+
     .company-logos {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .tech-grid {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     .education-item {
         flex-direction: column;
         gap: 1rem;
     }
-    
+
     .education-year {
         align-self: flex-start;
     }
@@ -656,7 +668,7 @@ footer {
     .company-logos {
         grid-template-columns: 1fr;
     }
-    
+
     .tech-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -668,7 +680,7 @@ footer {
         flex-direction: column;
         gap: 2rem;
     }
-    
+
     .additional-projects .project-card {
         width: 100%;
         margin-bottom: 0;
@@ -709,6 +721,24 @@ html {
     display: flex;
 }
 
+.ethglobal-logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.mercatus-logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 /* Glass Button Styles */
 .glass-button {
     cursor: pointer;
@@ -717,12 +747,10 @@ html {
     height: 50px;
     border-radius: 999px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.2) 0%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.03) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.03) 100%);
     backdrop-filter: url(#glass);
     transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 2.2);
     display: block;
@@ -741,22 +769,18 @@ html {
 .glass-button:hover {
     transform: scale(1.05);
     border-color: rgba(255, 255, 255, 0.5);
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.3) 0%,
-        rgba(255, 255, 255, 0.15) 50%,
-        rgba(255, 255, 255, 0.08) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.08) 100%);
 }
 
 /* Apply glass effect to view more buttons */
 .view-more-btn {
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.2) 0%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0.03) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.08) 50%,
+            rgba(255, 255, 255, 0.03) 100%);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     width: 48px;
@@ -773,12 +797,10 @@ html {
 }
 
 .view-more-btn:hover {
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.3) 0%,
-        rgba(255, 255, 255, 0.15) 50%,
-        rgba(255, 255, 255, 0.08) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.3) 0%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.08) 100%);
     color: #000000;
     transform: scale(1.1);
     border-color: rgba(255, 255, 255, 0.5);
@@ -791,14 +813,17 @@ footer {
     margin-top: 2rem;
 }
 
-@media (hover: none), (pointer: coarse) {
+@media (hover: none),
+(pointer: coarse) {
     .profile-pic-wrap {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
+
     .profile-pic-wrap::before {
         background: transparent !important;
     }
+
     .profile-pic {
         opacity: 1 !important;
         transform: none !important;
