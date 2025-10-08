@@ -730,6 +730,15 @@ html {
     vertical-align: middle;
 }
 
+.mercatus-logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 /* Glass Button Styles */
 .glass-button {
     cursor: pointer;
