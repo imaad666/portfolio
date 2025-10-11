@@ -325,6 +325,14 @@ section:last-of-type {
     color: transparent;
 }
 
+.eth-showcase-icon {
+    transition: all 0.3s ease;
+}
+
+.project-card:hover .eth-showcase-icon path {
+    fill: #ffffff;
+}
+
 .canvas-globe {
     color: #9ca3af;
     transition: all 0.3s ease;
