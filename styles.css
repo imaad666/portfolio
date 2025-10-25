@@ -330,7 +330,7 @@ section:last-of-type {
 }
 
 .project-card:hover .eth-showcase-icon path {
-    fill: #ffffff;
+    fill: #6b7280;
 }
 
 .canvas-globe {
