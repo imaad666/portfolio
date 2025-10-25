@@ -625,12 +625,6 @@ footer {
 }
 
 
-/* Debug: Make desktop-only visible with red background */
-.desktop-only {
-    background-color: red !important;
-    border: 2px solid red !important;
-}
-
 /* Hide desktop-only elements on mobile - maximum specificity */
 @media screen and (max-width: 768px) {
     .desktop-only {
@@ -643,24 +637,39 @@ footer {
         position: absolute !important;
         left: -9999px !important;
     }
+}
 
-    /* Maximum specificity targeting */
-    .project-external .desktop-only {
+/* Show mobile-only elements on mobile */
+@media screen and (max-width: 768px) {
+    .mobile-only {
+        display: block !important;
+    }
+}
+
+/* Hide mobile-only elements on desktop */
+@media screen and (min-width: 769px) {
+    .mobile-only {
         display: none !important;
     }
+}
 
-    .project-external a.desktop-only {
-        display: none !important;
-    }
+/* Maximum specificity targeting */
+.project-external .desktop-only {
+    display: none !important;
+}
 
-    .project-external a.github-link.desktop-only {
-        display: none !important;
-    }
+.project-external a.desktop-only {
+    display: none !important;
+}
 
-    /* Target the span inside */
-    .project-external a.github-link.desktop-only span {
-        display: none !important;
-    }
+.project-external a.github-link.desktop-only {
+    display: none !important;
+}
+
+/* Target the span inside */
+.project-external a.github-link.desktop-only span {
+    display: none !important;
+}
 }
 
 /* Responsive Design */
