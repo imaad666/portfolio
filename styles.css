@@ -270,7 +270,7 @@ section:last-of-type {
 
 .project-card {
     background: #ffffff;
-    border: 2px solid #e5e7eb;
+    border: none;
     border-radius: 20px;
     padding: 1.5rem;
     transition: all 0.3s ease;
@@ -280,9 +280,9 @@ section:last-of-type {
 }
 
 .project-card:hover {
-    border-color: #9ca3af;
     background: #f9fafb;
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 /* Remove the complex ::before pseudo-element */
