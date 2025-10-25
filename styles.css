@@ -625,23 +625,10 @@ footer {
 }
 
 
-/* Show/hide desktop vs mobile elements */
+/* Debug: Make desktop-only visible with red background */
 .desktop-only {
-    display: block;
-}
-
-.mobile-only {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .desktop-only {
-        display: none !important;
-    }
-    
-    .mobile-only {
-        display: block !important;
-    }
+    background-color: red !important;
+    border: 2px solid red !important;
 }
 
 /* Hide desktop-only elements on mobile - maximum specificity */
