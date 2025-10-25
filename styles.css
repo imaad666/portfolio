@@ -325,6 +325,27 @@ section:last-of-type {
     color: transparent;
 }
 
+/* Desktop positioning for specific links */
+@media (min-width: 769px) {
+    .eth-link {
+        position: absolute;
+        top: 0;
+        right: 48px;
+    }
+
+    .github-link {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    .live-link {
+        position: absolute;
+        top: 0;
+        right: 24px;
+    }
+}
+
 .eth-showcase-icon {
     transition: all 0.3s ease;
 }
@@ -604,6 +625,57 @@ footer {
 }
 
 
+/* Show/hide desktop vs mobile elements */
+.desktop-only {
+    display: block;
+}
+
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+    
+    .mobile-only {
+        display: block !important;
+    }
+}
+
+/* Hide desktop-only elements on mobile - maximum specificity */
+@media screen and (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+
+    /* Maximum specificity targeting */
+    .project-external .desktop-only {
+        display: none !important;
+    }
+
+    .project-external a.desktop-only {
+        display: none !important;
+    }
+
+    .project-external a.github-link.desktop-only {
+        display: none !important;
+    }
+
+    /* Target the span inside */
+    .project-external a.github-link.desktop-only span {
+        display: none !important;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
@@ -612,22 +684,6 @@ footer {
 
     h1 {
         font-size: 2rem;
-    }
-
-    h2 {
-        font-size: 1.5rem;
-    }
-
-    /* Size the wrapper on mobile, let the img fill it */
-    .profile-pic-wrap {
-        width: 120px;
-        height: 120px;
-    }
-
-    /* Remove any image-level fixed sizing that could fight object-fit */
-    .profile-pic {
-        width: 100%;
-        height: 100%;
     }
 
     .company-logos {
@@ -646,32 +702,94 @@ footer {
     .education-year {
         align-self: flex-start;
     }
+}
 
-    /* Fix mobile logo overlapping in project cards */
+/* MOBILE FIX: Force vertical stacking - separate media query for higher specificity */
+@media screen and (max-width: 768px) {
+
     .project-external {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        z-index: 1;
+        position: absolute !important;
+        top: 1rem !important;
+        right: 1rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.3rem !important;
+        z-index: 1 !important;
+        width: 16px !important;
+        height: auto !important;
+        align-items: center !important;
     }
 
     .project-external a {
-        display: block;
-        width: 16px;
-        height: 16px;
-        text-decoration: none;
-        color: transparent;
-        position: static !important;
-    }
-
-    /* Remove absolute positioning from individual links on mobile */
-    .project-external a[style*="position: absolute"] {
         position: static !important;
         top: auto !important;
         right: auto !important;
+        left: auto !important;
+        display: block !important;
+        width: 16px !important;
+        height: 16px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* Hide GitHub link completely from flex container */
+    .project-external a.github-link {
+        display: none !important;
+        order: -1 !important;
+        flex: 0 0 0 !important;
+    }
+
+    /* Keep ETH and browser icons in corner */
+    .eth-link,
+    .live-link {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    /* Hide GitHub link in corner on mobile - more aggressive */
+    .project-external .github-link {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Hide the span inside GitHub link to remove the arrow */
+    .project-external .github-link span {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    /* Alternative: Hide the entire GitHub link container */
+    .project-external a[href*="github.com"] {
+        display: none !important;
+    }
+
+    /* Style inline GitHub link */
+    .github-link-inline {
+        display: inline-block !important;
+        margin-left: 0.5rem !important;
+        vertical-align: middle !important;
+        width: 16px !important;
+        height: 16px !important;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8'/%3E%3C/svg%3E") !important;
+        background-repeat: no-repeat !important;
+        background-size: contain !important;
+        background-position: center !important;
     }
 }
 
@@ -682,6 +800,20 @@ footer {
 
     .tech-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Extra aggressive mobile fix for very small screens */
+    .project-external {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+    }
+
+    .project-external a {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
     }
 }
 
