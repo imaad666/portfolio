@@ -381,7 +381,7 @@ section:last-of-type {
     border-radius: 9999px;
     font-size: 0.9rem;
     font-weight: 500;
-    border: 1px solid #d1d5db;
+    border: none;
 }
 
 .project-tags a.tag {
