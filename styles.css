@@ -646,6 +646,33 @@ footer {
     .education-year {
         align-self: flex-start;
     }
+
+    /* Fix mobile logo overlapping in project cards */
+    .project-external {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        z-index: 1;
+    }
+
+    .project-external a {
+        display: block;
+        width: 16px;
+        height: 16px;
+        text-decoration: none;
+        color: transparent;
+        position: static !important;
+    }
+
+    /* Remove absolute positioning from individual links on mobile */
+    .project-external a[style*="position: absolute"] {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+    }
 }
 
 @media (max-width: 480px) {
