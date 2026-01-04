@@ -732,6 +732,14 @@ html {
     vertical-align: middle;
 }
 
+.ibm-logo {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    display: flex;
+}
+
 /* Glass Button Styles */
 .glass-button {
     cursor: pointer;
