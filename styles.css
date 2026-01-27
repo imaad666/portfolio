@@ -740,6 +740,47 @@ html {
     display: flex;
 }
 
+/* Badges Section */
+.badges-section {
+    margin-bottom: 3rem;
+    padding-top: 2rem;
+}
+
+.badges-intro {
+    font-size: 1.05rem;
+    color: #4b5563;
+    margin-bottom: 1rem;
+}
+
+.badges-embed {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+.badges-placeholder {
+    padding: 1.25rem 1.5rem 0.75rem;
+    font-size: 0.98rem;
+    color: #4b5563;
+}
+
+.badges-link {
+    padding: 0 1.5rem 1.25rem;
+    margin-top: 0.25rem;
+}
+
+.badges-link a {
+    font-size: 0.95rem;
+    color: #111827;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.badges-link a:hover {
+    color: #000000;
+}
+
 /* Glass Button Styles */
 .glass-button {
     cursor: pointer;
