@@ -188,16 +188,30 @@ function setupDarkMode() {
         return;
     }
 
-    const toggleIcon = darkModeToggle.querySelector('.theme-toggle__icon');
+    const sunIcon = `
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2.5v2.5"></path>
+        <path d="M12 19v2.5"></path>
+        <path d="m4.93 4.93 1.77 1.77"></path>
+        <path d="m17.3 17.3 1.77 1.77"></path>
+        <path d="M2.5 12H5"></path>
+        <path d="M19 12h2.5"></path>
+        <path d="m4.93 19.07 1.77-1.77"></path>
+        <path d="m17.3 6.7 1.77-1.77"></path>
+    `;
+    const moonIcon = `
+        <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 1 0 9.8 9.8Z"></path>
+    `;
 
     const applyTheme = (isDarkMode) => {
         document.body.classList.toggle('dark-mode', isDarkMode);
         darkModeToggle.setAttribute('aria-pressed', String(isDarkMode));
         darkModeToggle.setAttribute('aria-label', isDarkMode ? 'Switch to light mode' : 'Switch to night mode');
-
-        if (toggleIcon) {
-            toggleIcon.textContent = isDarkMode ? '☾' : '☀';
-        }
+        darkModeToggle.innerHTML = `
+            <svg class="theme-toggle__icon theme-toggle__icon--${isDarkMode ? 'moon' : 'sun'}" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                ${isDarkMode ? moonIcon : sunIcon}
+            </svg>
+        `;
     };
 
     const savedDarkMode = localStorage.getItem('darkMode');
