@@ -109,16 +109,22 @@ function smoothScrollTo(target) {
     }
 }
 
-// Add parallax effect for profile section
+// Add lightweight parallax effect for profile section
+const profileSection = document.querySelector('.profile-section');
+let parallaxTicking = false;
+
 window.addEventListener('scroll', function() {
-    const scrolled = window.pageYOffset;
-    const profileSection = document.querySelector('.profile-section');
-    
-    if (profileSection) {
-        const rate = scrolled * -0.5;
-        profileSection.style.transform = `translateY(${rate}px)`;
+    if (!profileSection || parallaxTicking) {
+        return;
     }
-});
+
+    parallaxTicking = true;
+    window.requestAnimationFrame(() => {
+        const rate = window.pageYOffset * -0.18;
+        profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
+        parallaxTicking = false;
+    });
+}, { passive: true });
 
 // Add loading animation
 window.addEventListener('load', function() {
@@ -175,24 +181,35 @@ function setupContactForm() {
 // Initialize contact form if it exists
 setupContactForm();
 
-// Add dark mode toggle (optional feature)
+// Add dark mode toggle
 function setupDarkMode() {
-    const darkModeToggle = document.querySelector('#dark-mode-toggle');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            
-            // Save preference to localStorage
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-        });
-        
-        // Check for saved preference
-        const savedDarkMode = localStorage.getItem('darkMode');
-        if (savedDarkMode === 'true') {
-            document.body.classList.add('dark-mode');
-        }
+    const darkModeToggle = document.querySelector('#theme-toggle');
+    if (!darkModeToggle) {
+        return;
     }
+
+    const toggleIcon = darkModeToggle.querySelector('.theme-toggle__icon');
+
+    const applyTheme = (isDarkMode) => {
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        darkModeToggle.setAttribute('aria-pressed', String(isDarkMode));
+        darkModeToggle.setAttribute('aria-label', isDarkMode ? 'Switch to light mode' : 'Switch to night mode');
+
+        if (toggleIcon) {
+            toggleIcon.textContent = isDarkMode ? '☾' : '☀';
+        }
+    };
+
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode !== null) {
+        applyTheme(savedDarkMode === 'true');
+    }
+
+    darkModeToggle.addEventListener('click', function() {
+        const isDarkMode = !document.body.classList.contains('dark-mode');
+        applyTheme(isDarkMode);
+        localStorage.setItem('darkMode', String(isDarkMode));
+    });
 }
 
 // Initialize dark mode if toggle exists
@@ -216,29 +233,18 @@ function setupScrollProgress() {
     document.body.appendChild(progressBar);
     
     window.addEventListener('scroll', function() {
-        const scrolled = (window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        progressBar.style.width = scrolled + '%';
-    });
+        window.requestAnimationFrame(() => {
+            const scrolled = (window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+    }, { passive: true });
 }
 
 // Initialize scroll progress
 setupScrollProgress();
 
-// Glass Button Displacement Map and circular favicon
+// Footer button and circular favicon
 document.addEventListener('DOMContentLoaded', () => {
-    const feImage = document.querySelector('feImage');
-    if (feImage) {
-        fetch('https://essykings.github.io/JavaScript/map.png')
-            .then((response) => response.blob())
-            .then((blob) => {
-                const objURL = URL.createObjectURL(blob);
-                feImage.setAttribute('href', objURL);
-            })
-            .catch((error) => {
-                console.log('Could not load displacement map:', error);
-            });
-    }
-
     // Build a circular PNG favicon from the profile photo at runtime
     function setCircularFavicon(src) {
         const img = new Image();
