@@ -1,8 +1,7 @@
 /* Reset and Base Styles */
 @font-face {
     font-family: 'Paperlogy';
-    src: url('assets/Paperlogy-4Regular.woff2') format('woff2'),
-        url('assets/Paperlogy-4Regular.ttf') format('truetype');
+    src: url('assets/Paperlogy-4Regular.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -10,8 +9,7 @@
 
 @font-face {
     font-family: 'Paperlogy';
-    src: url('assets/Paperlogy-5Medium.woff2') format('woff2'),
-        url('assets/Paperlogy-5Medium.ttf') format('truetype');
+    src: url('assets/Paperlogy-5Medium.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
