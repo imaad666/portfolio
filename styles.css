@@ -265,9 +265,6 @@ section:last-of-type {
     animation: marquee-scroll 20s linear infinite;
 }
 
-.marquee:hover .marquee-track {
-    animation-play-state: paused;
-}
 
 .marquee-item {
     display: flex;
