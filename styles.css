@@ -810,6 +810,15 @@ html {
     display: flex;
 }
 
+.codex-logo {
+    height: 1.2em;
+    width: auto;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 /* Badges Section */
 .badges-section {
     margin-bottom: 3rem;
