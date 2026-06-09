@@ -1,5 +1,58 @@
 // Portfolio Website JavaScript
 
+// Time Display Functionality
+function updateTimeDisplay() {
+    // Get current time in IST (UTC+5:30)
+    const now = new Date();
+    
+    // Convert to IST by using toLocaleString with Asia/Kolkata timezone
+    const istTimeString = now.toLocaleString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }) + ' IST';
+    
+    // Update IST time display
+    const istTimeElement = document.getElementById('ist-time');
+    if (istTimeElement) {
+        istTimeElement.textContent = istTimeString;
+    }
+    
+    // Calculate time difference
+    const userOffset = -now.getTimezoneOffset(); // User's offset in minutes from UTC
+    const istOffsetMinutes = 5.5 * 60; // IST offset in minutes
+    const diffMinutes = istOffsetMinutes - userOffset;
+    const diffHours = Math.abs(diffMinutes / 60);
+    
+    let timeDiffText = '';
+    if (diffMinutes === 0) {
+        timeDiffText = "We're in the same timezone!";
+    } else {
+        const ahead = diffMinutes > 0;
+        const hoursPart = Math.floor(diffHours);
+        const minutesPart = Math.abs(diffMinutes % 60);
+        
+        if (minutesPart === 0) {
+            timeDiffText = `I'm ${hoursPart} hour${hoursPart !== 1 ? 's' : ''} ${ahead ? 'ahead of' : 'behind'} you`;
+        } else if (minutesPart === 30) {
+            timeDiffText = `I'm ${hoursPart}.5 hours ${ahead ? 'ahead of' : 'behind'} you`;
+        } else {
+            timeDiffText = `I'm ${hoursPart}h ${minutesPart}m ${ahead ? 'ahead of' : 'behind'} you`;
+        }
+    }
+    
+    const timeDiffElement = document.getElementById('time-difference');
+    if (timeDiffElement) {
+        timeDiffElement.textContent = timeDiffText;
+    }
+}
+
+// Update time immediately and then every second
+updateTimeDisplay();
+setInterval(updateTimeDisplay, 1000);
+
 // View More/Less Projects Functionality
 function showMore() {
     const additionalProjects = document.getElementById('additionalProjects');
