@@ -276,6 +276,12 @@ section:last-of-type {
     border-bottom: none;
 }
 
+/* Hide sections initially for scroll reveal animation */
+section:not(.profile-section) {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
 /* About Section */
 .about-section p {
     font-size: 1.15rem;

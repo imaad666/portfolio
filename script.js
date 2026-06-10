@@ -104,7 +104,8 @@ const observer = new IntersectionObserver((entries) => {
 
 // Observe all sections
 document.addEventListener('DOMContentLoaded', () => {
-    const sections = document.querySelectorAll('section, .projects-grid, .tech-grid, .education-grid, .contact-links');
+    // Exclude the profile section (header) from animation, but include all other sections
+    const sections = document.querySelectorAll('section:not(.profile-section), .projects-grid, .tech-grid, .education-grid, .contact-links');
     sections.forEach(section => {
         section.style.opacity = '0';
         section.style.transform = 'translateY(20px)';
@@ -162,22 +163,30 @@ function smoothScrollTo(target) {
     }
 }
 
-// Add lightweight parallax effect for profile section
+// Add lightweight parallax effect for profile section (desktop only)
 const profileSection = document.querySelector('.profile-section');
 let parallaxTicking = false;
 
-window.addEventListener('scroll', function() {
-    if (!profileSection || parallaxTicking) {
-        return;
-    }
+// Check if device is mobile/touch device
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+                 ('ontouchstart' in window) ||
+                 (navigator.maxTouchPoints > 0);
 
-    parallaxTicking = true;
-    window.requestAnimationFrame(() => {
-        const rate = window.pageYOffset * -0.18;
-        profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
-        parallaxTicking = false;
-    });
-}, { passive: true });
+// Only apply parallax on desktop devices
+if (!isMobile) {
+    window.addEventListener('scroll', function() {
+        if (!profileSection || parallaxTicking) {
+            return;
+        }
+
+        parallaxTicking = true;
+        window.requestAnimationFrame(() => {
+            const rate = window.pageYOffset * -0.18;
+            profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
+            parallaxTicking = false;
+        });
+    }, { passive: true });
+}
 
 // Add loading animation
 window.addEventListener('load', function() {
