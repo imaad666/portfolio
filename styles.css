@@ -840,6 +840,15 @@ html {
     vertical-align: middle;
 }
 
+.bob-logo {
+    height: 1.4em;
+    width: auto;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .ibm-logo {
     width: 2rem;
     height: 2rem;
