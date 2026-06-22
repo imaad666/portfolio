@@ -206,17 +206,6 @@ body.dark-mode .profile-pic-wrap:hover::before {
     gap: 0.85rem;
 }
 
-.verified-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    color: #ffffff;
-    background: #9ca3af;
-    border-radius: 9999px;
-}
-
 .subtitle {
     font-size: 1.25rem;
     color: var(--muted-color);
@@ -254,17 +243,6 @@ body.dark-mode .profile-pic-wrap:hover::before {
 .time-diff-value {
     font-weight: 500;
     color: var(--body-color);
-}
-
-.underline-link {
-    color: #cbd5e1;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-}
-
-.underline-link:hover {
-    color: #ffffff;
 }
 
 /* Sections */
@@ -494,21 +472,6 @@ section:not(.profile-section) {
     text-decoration: none;
 }
 
-.project-links {
-    position: absolute;
-    top: 0.9rem;
-    right: 0.9rem;
-    display: inline-flex;
-    gap: 0.5rem;
-}
-
-.project-link {
-    color: #9ca3af;
-}
-
-.project-link:hover {
-    color: #ffffff;
-}
 
 /* View More Button */
 .view-more-container {
@@ -606,47 +569,6 @@ section:not(.profile-section) {
     font-weight: 500;
 }
 
-/* Tech Stack Section */
-.tech-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1.5rem;
-    margin: 2rem 0;
-    padding: 2rem;
-    border-radius: 16px;
-    background: var(--surface-muted);
-    border: 1px solid var(--border-soft);
-}
-
-.tech-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 8px;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    background: var(--surface-color);
-    border: 1px solid var(--border-soft);
-}
-
-.tech-item:hover {
-    background: var(--surface-muted);
-    transform: translateY(-2px);
-}
-
-.tech-item i {
-    font-size: 2rem;
-    color: #374151;
-}
-
-
-.tech-item span {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #000000;
-}
-
 /* Education Section */
 .education-grid {
     display: grid;
@@ -668,14 +590,6 @@ section:not(.profile-section) {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-}
-
-.school-logo {
-    width: 2rem;
-    height: 2rem;
-    object-fit: contain;
-    margin-right: 0.5rem;
-    display: flex;
 }
 
 .education-content .degree {
@@ -728,13 +642,6 @@ footer {
         height: 100%;
     }
 
-    .company-logos {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .tech-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
 
     .education-item {
         flex-direction: column;
@@ -747,13 +654,6 @@ footer {
 }
 
 @media (max-width: 480px) {
-    .company-logos {
-        grid-template-columns: 1fr;
-    }
-
-    .tech-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 
     .theme-toggle {
         width: 2rem;
