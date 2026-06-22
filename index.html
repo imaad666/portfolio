@@ -52,14 +52,18 @@
     <link rel="shortcut icon" href="assets/profile.jpg?v=3" type="image/jpeg">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/profile.jpg?v=3">
 
+    <!-- Preconnect to external resources for faster loading -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
     <!-- Preload Fonts -->
-    <link rel="preload" href="assets/Paperlogy-4Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="preload" href="assets/Paperlogy-5Medium.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="assets/Paperlogy-4Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/Paperlogy-5Medium.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css?v=7">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
+    <link rel="stylesheet" href="styles.css?v=8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" media="print" onload="this.media='all'">
 </head>
 
 <body>
@@ -68,7 +72,7 @@
         <header class="profile-section" id="home">
             <div class="profile-image">
                 <div class="profile-pic-wrap">
-                    <img src="assets/profile.jpg?v=2" alt="Profile picture" class="profile-pic">
+                    <img src="assets/profile.jpg?v=2" alt="Profile picture" class="profile-pic" fetchpriority="high">
                 </div>
             </div>
             <div class="name-row">
@@ -115,7 +119,7 @@
                 <div class="education-item">
                     <div class="education-content">
                         <h3>
-                            <img src="assets/IBM Logo.png" alt="IBM Logo" class="ibm-logo">
+                            <img src="assets/IBM Logo.png" alt="IBM Logo" class="ibm-logo" loading="lazy">
                             IBM, Bengaluru, Karnataka
                         </h3>
                         <p class="degree">Mainframe Developer & Quality Engineer</p>
@@ -132,7 +136,7 @@
                 <div class="education-item">
                     <div class="education-content">
                         <h3>
-                            <img src="assets/MVJ .png" alt="MVJ College" class="mvj-logo">
+                            <img src="assets/MVJ .png" alt="MVJ College" class="mvj-logo" loading="lazy">
                             MVJ College Of Engineering, Bengaluru, Karnataka
                         </h3>
                         <p class="degree">Bachelors of Engineering in Computer Science and Design</p>
@@ -142,7 +146,7 @@
                 <div class="education-item">
                     <div class="education-content">
                         <h3>
-                            <img src="assets/bhs.jpeg" alt="Burn Hall School Logo" class="burnhall-logo">
+                            <img src="assets/bhs.jpeg" alt="Burn Hall School Logo" class="burnhall-logo" loading="lazy">
                             Burn Hall School, Srinagar, Jammu Kashmir
                         </h3>
                         <p class="degree">Higher Secondary</p>
@@ -198,7 +202,7 @@
                         </a>
                     </div>
                     <h3>
-                        <img src="assets/bob.svg" alt="IBM Bob Logo" class="bob-logo">
+                        <img src="assets/bob.svg" alt="IBM Bob Logo" class="bob-logo" loading="lazy">
                         IBM WRLD - IBM Bobathon 2026
                     </h3>
                     <p>Built for the IBM ICA Bobathon 2026. An interactive dashboard mapping IBM's global offices,
@@ -229,7 +233,7 @@
                         </a>
                     </div>
                     <h3>
-                        <img src="assets/codex.png" alt="Codex Logo" class="codex-logo">
+                        <img src="assets/codex.png" alt="Codex Logo" class="codex-logo" loading="lazy">
                         Open IDE - Codex Kochi
                     </h3>
                     <p>A multi-agent coding IDE powered by Groq. Connect a GitHub repo, describe what you want built, and watch Altbot run hyperreasoning across three architectural plan branches before specialist agents stream code into a live workspace. Features GitHub OAuth integration, real-time code editing, and direct push to repositories.</p>
@@ -252,7 +256,7 @@
                         </a>
                     </div>
                     <h3>
-                        <img src="assets/Monad Logo.png" alt="Monad Logo" class="monad-logo">
+                        <img src="assets/Monad Logo.png" alt="Monad Logo" class="monad-logo" loading="lazy">
                         MON Go - Monad Blitz Bangalore 3
                     </h3>
                     <p>1st place at Monad Blitz Bangalore 3. Built a location-based game inspired by Pokémon Go where
@@ -299,7 +303,7 @@
                         </a>
                     </div>
                     <h3>
-                        <img src="assets/ethg_logo.png" alt="ETHGlobal Logo" class="ethglobal-logo">
+                        <img src="assets/ethg_logo.png" alt="ETHGlobal Logo" class="ethglobal-logo" loading="lazy">
                         PiggyBit - ETHGlobal New Delhi
                     </h3>
                     <p>A decentralized savings application built for Rootstock and Ethereum networks. Create goal-based
@@ -322,7 +326,7 @@
                         </a>
                     </div>
                     <h3>
-                        <img src="assets/mercatus_.png" alt="Mercatus Logo" class="mercatus-logo">
+                        <img src="assets/mercatus_.png" alt="Mercatus Logo" class="mercatus-logo" loading="lazy">
                         Project Goldbach - Mercatus Center
                     </h3>
                     <p>Received a grant for $4600 from Mercatus Center. Developed an AI-powered bioinformatics agent
@@ -369,7 +373,7 @@
                         </a>
                     </div>
                     <h3>
-                        <img src="assets/Monad Logo.png" alt="Monad Logo" class="monad-logo">
+                        <img src="assets/Monad Logo.png" alt="Monad Logo" class="monad-logo" loading="lazy">
                         Canvas - Monad Blitz Bangalore 2
                     </h3>
                     <p>4th place at Monad Blitz Bangalore-2, 2025. Developed a collaborative pixel art canvas on the
@@ -705,7 +709,7 @@
         </script>
     </div>
 
-    <script src="script.js"></script>
+    <script defer src="script.js"></script>
     <script>
         window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
     </script>
