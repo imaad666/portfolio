@@ -263,6 +263,59 @@ section:not(.profile-section) {
 }
 
 /* About Section */
+.contributions-section {
+    margin-bottom: 3rem;
+}
+
+.contributions-intro {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--body-color);
+}
+
+.contributions-profile-link {
+    color: var(--muted-color);
+    text-decoration: none;
+}
+
+.contributions-profile-link:hover {
+    color: var(--heading-color);
+    text-decoration: underline;
+}
+
+.contributions-heatmap-wrap {
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.contributions-heatmap {
+    display: flex;
+    gap: 3px;
+    min-width: max-content;
+}
+
+.contributions-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.contributions-day {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    background-color: #ebedf0;
+}
+
+.contributions-fallback {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--muted-color);
+}
+
 .about-section p {
     font-size: 1.15rem;
     line-height: 1.9;
