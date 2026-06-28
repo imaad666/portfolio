@@ -89,14 +89,23 @@ const observer = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
         }
     });
 }, observerOptions);
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Observe all sections
 document.addEventListener('DOMContentLoaded', () => {
     const sections = document.querySelectorAll('section:not(.profile-section), .projects-grid, .tech-grid, .education-grid, .contact-links');
     sections.forEach(section => {
+        if (prefersReducedMotion) {
+            section.style.opacity = '1';
+            section.style.transform = 'none';
+            return;
+        }
+
         section.style.opacity = '0';
         section.style.transform = 'translateY(20px)';
         section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -105,30 +114,38 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Add lightweight parallax effect for profile section (desktop only)
+// Shared scroll handler (parallax + progress bar) to avoid jank from multiple listeners
 const profileSection = document.querySelector('.profile-section');
-let parallaxTicking = false;
+let scrollProgressBar = null;
+let scrollTicking = false;
 
-// Check if device is mobile/touch device
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
                  ('ontouchstart' in window) ||
                  (navigator.maxTouchPoints > 0);
 
-// Only apply parallax on desktop devices
-if (!isMobile) {
-    window.addEventListener('scroll', function() {
-        if (!profileSection || parallaxTicking) {
-            return;
-        }
+function handleScrollFrame() {
+    if (profileSection && !isMobile && !prefersReducedMotion) {
+        const rate = window.pageYOffset * -0.18;
+        profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
+    }
 
-        parallaxTicking = true;
-        window.requestAnimationFrame(() => {
-            const rate = window.pageYOffset * -0.18;
-            profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
-            parallaxTicking = false;
-        });
-    }, { passive: true });
+    if (scrollProgressBar) {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = maxScroll > 0 ? (window.pageYOffset / maxScroll) * 100 : 0;
+        scrollProgressBar.style.width = `${scrolled}%`;
+    }
+
+    scrollTicking = false;
 }
+
+window.addEventListener('scroll', () => {
+    if (scrollTicking) {
+        return;
+    }
+
+    scrollTicking = true;
+    window.requestAnimationFrame(handleScrollFrame);
+}, { passive: true });
 
 // Add loading animation
 window.addEventListener('load', function() {
@@ -204,9 +221,9 @@ setupDarkMode();
 
 // Add scroll progress indicator
 function setupScrollProgress() {
-    const progressBar = document.createElement('div');
-    progressBar.className = 'scroll-progress';
-    progressBar.style.cssText = `
+    scrollProgressBar = document.createElement('div');
+    scrollProgressBar.className = 'scroll-progress';
+    scrollProgressBar.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
@@ -214,17 +231,9 @@ function setupScrollProgress() {
         height: 3px;
         background: #ff0000;
         z-index: 1000;
-        transition: width 0.1s ease;
     `;
-    
-    document.body.appendChild(progressBar);
-    
-    window.addEventListener('scroll', function() {
-        window.requestAnimationFrame(() => {
-            const scrolled = (window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            progressBar.style.width = scrolled + '%';
-        });
-    }, { passive: true });
+
+    document.body.appendChild(scrollProgressBar);
 }
 
 // Initialize scroll progress

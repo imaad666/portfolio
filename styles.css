@@ -740,9 +740,9 @@ footer {
     }
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling only for programmatic jumps, not wheel/trackpad */
 html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
     background-color: var(--bg-color);
 }
 
@@ -870,8 +870,7 @@ html {
     height: auto;
     display: block;
     object-fit: contain;
-    filter: grayscale(60%);
-    transition: filter 0.25s ease, opacity 0.25s ease;
+    filter: grayscale(100%);
 }
 
 .badge-card:hover .badge-card__image {
@@ -950,5 +949,24 @@ footer {
     .profile-pic {
         opacity: 1 !important;
         transform: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    section:not(.profile-section) {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
