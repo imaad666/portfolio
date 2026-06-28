@@ -276,6 +276,53 @@ async function loadGitHubContributions() {
 
 document.addEventListener('DOMContentLoaded', loadGitHubContributions);
 
+async function loadCredlyBadges() {
+    const grid = document.getElementById('badges-grid');
+    const countEl = document.getElementById('badges-count');
+    const fallbackEl = document.getElementById('badges-fallback');
+
+    if (!grid || !countEl || !fallbackEl) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/credly-badges');
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Could not load badges');
+        }
+
+        countEl.textContent = `${data.count} verified badge${data.count === 1 ? '' : 's'} on Credly`;
+        grid.innerHTML = '';
+
+        data.badges.forEach((badge) => {
+            const link = document.createElement('a');
+            link.className = 'badge-card';
+            link.href = badge.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.title = badge.issuer ? `${badge.name} — ${badge.issuer}` : badge.name;
+
+            const img = document.createElement('img');
+            img.src = badge.image;
+            img.alt = badge.name;
+            img.loading = 'lazy';
+            img.className = 'badge-card__image';
+
+            link.appendChild(img);
+            grid.appendChild(link);
+        });
+    } catch (error) {
+        countEl.textContent = 'Certifications and badges';
+        fallbackEl.hidden = false;
+        fallbackEl.textContent = 'Could not load badges right now.';
+        grid.innerHTML = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadCredlyBadges);
+
 // Footer button and circular favicon
 document.addEventListener('DOMContentLoaded', () => {
     // Build a circular PNG favicon from the profile photo at runtime
