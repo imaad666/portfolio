@@ -230,6 +230,52 @@ function setupScrollProgress() {
 // Initialize scroll progress
 setupScrollProgress();
 
+// GitHub contribution heatmap (fetched via serverless API; token stays in Vercel env)
+async function loadGitHubContributions() {
+    const heatmap = document.getElementById('contributions-heatmap');
+    const totalEl = document.getElementById('contributions-total');
+    const fallbackEl = document.getElementById('contributions-fallback');
+
+    if (!heatmap || !totalEl || !fallbackEl) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/github-contributions');
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Could not load contributions');
+        }
+
+        totalEl.textContent = `${data.totalContributions.toLocaleString()} contributions in the last year`;
+        heatmap.innerHTML = '';
+
+        data.weeks.forEach((week) => {
+            const weekCol = document.createElement('div');
+            weekCol.className = 'contributions-week';
+
+            week.contributionDays.forEach((day) => {
+                const cell = document.createElement('div');
+                cell.className = 'contributions-day';
+                cell.style.backgroundColor = day.color;
+                cell.title = `${day.date}: ${day.contributionCount} contribution${day.contributionCount === 1 ? '' : 's'}`;
+                cell.setAttribute('aria-label', cell.title);
+                weekCol.appendChild(cell);
+            });
+
+            heatmap.appendChild(weekCol);
+        });
+    } catch (error) {
+        totalEl.textContent = 'GitHub activity unavailable';
+        fallbackEl.hidden = false;
+        fallbackEl.textContent = 'Could not load contribution data right now.';
+        heatmap.innerHTML = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadGitHubContributions);
+
 // Footer button and circular favicon
 document.addEventListener('DOMContentLoaded', () => {
     // Build a circular PNG favicon from the profile photo at runtime
