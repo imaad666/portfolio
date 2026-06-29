@@ -782,6 +782,17 @@ html {
     display: flex;
 }
 
+.education-section .mvj-logo,
+.education-section .burnhall-logo {
+    filter: grayscale(100%);
+    transition: filter 0.25s ease;
+}
+
+.education-section .education-item:hover .mvj-logo,
+.education-section .education-item:hover .burnhall-logo {
+    filter: grayscale(0%);
+}
+
 .ethglobal-logo {
     height: 1.2em;
     width: auto;
