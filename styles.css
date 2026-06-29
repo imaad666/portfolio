@@ -846,6 +846,15 @@ html {
     filter: grayscale(0%);
 }
 
+.projects-section .project-card img[class$="-logo"] {
+    filter: grayscale(100%);
+    transition: filter 0.25s ease;
+}
+
+.projects-section .project-card:hover img[class$="-logo"] {
+    filter: grayscale(0%);
+}
+
 .codex-logo {
     height: 1.2em;
     width: auto;
