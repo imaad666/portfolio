@@ -267,7 +267,11 @@ async function loadGitHubContributions() {
             week.contributionDays.forEach((day) => {
                 const cell = document.createElement('div');
                 cell.className = 'contributions-day';
-                cell.style.backgroundColor = day.color;
+                if (day.contributionCount === 0) {
+                    cell.classList.add('contributions-day--empty');
+                } else {
+                    cell.style.backgroundColor = day.color;
+                }
                 cell.title = `${day.date}: ${day.contributionCount} contribution${day.contributionCount === 1 ? '' : 's'}`;
                 cell.setAttribute('aria-label', cell.title);
                 weekCol.appendChild(cell);

@@ -222,7 +222,7 @@ body.dark-mode .profile-pic-wrap:hover::before {
 
 .my-time,
 .time-diff {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--muted-color);
     margin: 0;
     display: flex;
@@ -235,14 +235,20 @@ body.dark-mode .profile-pic-wrap:hover::before {
 }
 
 .time-value {
-    font-family: 'Courier New', monospace;
-    font-weight: 600;
-    color: var(--body-color);
+    font-family: 'Paperlogy', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--heading-color);
 }
 
 .time-diff-value {
-    font-weight: 500;
-    color: var(--body-color);
+    font-family: 'Paperlogy', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: var(--muted-color);
 }
 
 /* Sections */
@@ -308,6 +314,14 @@ section:not(.profile-section) {
     height: 12px;
     border-radius: 2px;
     background-color: #ebedf0;
+}
+
+.contributions-day--empty {
+    background-color: #ebedf0;
+}
+
+body.dark-mode .contributions-day--empty {
+    background-color: #21262d;
 }
 
 .contributions-fallback {
