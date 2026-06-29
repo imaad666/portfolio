@@ -826,6 +826,15 @@ html {
     display: flex;
 }
 
+.experience-section .ibm-logo {
+    filter: grayscale(100%);
+    transition: filter 0.25s ease;
+}
+
+.experience-section .education-item:hover .ibm-logo {
+    filter: grayscale(0%);
+}
+
 .codex-logo {
     height: 1.2em;
     width: auto;
