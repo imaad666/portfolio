@@ -279,6 +279,13 @@ async function loadGitHubContributions() {
 
             heatmap.appendChild(weekCol);
         });
+
+        const wrap = heatmap.parentElement;
+        if (wrap) {
+            requestAnimationFrame(() => {
+                wrap.scrollLeft = wrap.scrollWidth;
+            });
+        }
     } catch (error) {
         totalEl.textContent = 'GitHub activity unavailable';
         fallbackEl.hidden = false;
