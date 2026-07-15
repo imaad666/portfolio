@@ -345,7 +345,7 @@ document.addEventListener('DOMContentLoaded', loadCredlyBadges);
 
 // Footer button and circular favicon
 document.addEventListener('DOMContentLoaded', () => {
-    // Build a circular PNG favicon from the profile photo at runtime
+    // Build a circular PNG favicon from the full profile photo at runtime
     function setCircularFavicon(src) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
@@ -360,7 +360,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
             ctx.closePath();
             ctx.clip();
-            ctx.drawImage(img, 0, 0, size, size);
+
+            // Cover crop of the full image so the whole body is visible
+            const scale = Math.max(size / img.width, size / img.height);
+            const w = img.width * scale;
+            const h = img.height * scale;
+            const x = (size - w) / 2;
+            const y = (size - h) / 2;
+            ctx.drawImage(img, x, y, w, h);
+
             const url = canvas.toDataURL('image/png');
             let link = document.querySelector('link[rel="icon"]');
             if (!link) {
@@ -376,11 +384,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 shortcut.href = url;
             }
         };
-        // cache-bust the source
         img.src = src + (src.includes('?') ? '&' : '?') + 'cb=' + Date.now();
     }
 
-    setCircularFavicon('assets/profile.jpg');
+    setCircularFavicon('assets/imaad.jpg');
 
     // Glass Button Scroll to Top Functionality
     const glassButton = document.querySelector('.glass-button');

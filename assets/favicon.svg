@@ -4,5 +4,6 @@
       <circle cx="32" cy="32" r="32" />
     </clipPath>
   </defs>
-  <image href="profile.jpg?v=2" width="64" height="64" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip)" />
+  <circle cx="32" cy="32" r="32" fill="#1a2744" />
+  <image href="imaad.jpg?v=6" width="64" height="64" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip)" />
 </svg>
