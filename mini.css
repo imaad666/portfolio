@@ -6,7 +6,6 @@
     --ink: #1a1814;
     --ink-soft: #3d3a34;
     --muted: #7a756c;
-    --rule: rgba(26, 24, 20, 0.16);
     --link: #1a1814;
     --wash: rgba(26, 24, 20, 0.035);
     --heat-0: rgba(26, 24, 20, 0.07);
@@ -16,10 +15,9 @@
     --heat-4: rgba(26, 24, 20, 0.88);
     --sheet-pad: clamp(0.85rem, 2.5vw, 1.75rem);
     --bento-max: 58rem;
-    --bento-gap: 0.65rem;
-    --cell-bg: rgba(247, 243, 235, 0.58);
-    --cell-border: 1px solid var(--rule);
-    --cell-radius: 0.4rem;
+    --bento-gap: 0.9rem;
+    --cell-bg: rgba(247, 243, 235, 0.55);
+    --cell-radius: 0.65rem;
     --cell-pad: clamp(0.85rem, 1.6vw, 1.2rem);
 }
 
@@ -154,18 +152,11 @@ body {
     gap: var(--bento-gap);
 }
 
-/* framed cells — remove .bento--framed or add .bento--seamless to go borderless */
-.bento--framed .tile {
-    padding: var(--cell-pad);
-    background: var(--cell-bg);
-    border: var(--cell-border);
-    border-radius: var(--cell-radius);
-}
-
+/* no borders, no fills — sections are just spacing on the page */
+.bento--framed .tile,
 .bento--seamless .tile {
     padding: var(--cell-pad);
     background: transparent;
-    border: none;
     border-radius: 0;
 }
 
@@ -226,24 +217,23 @@ body {
 }
 
 .project-controls__btn {
-    border: 1px solid var(--rule);
-    background: rgba(255, 255, 255, 0.45);
+    border: none;
+    background: rgba(255, 255, 255, 0.5);
     color: var(--ink-soft);
     width: 1.7rem;
     height: 1.5rem;
     line-height: 1;
-    border-radius: 0.25rem;
+    border-radius: 0.35rem;
     cursor: pointer;
     font: inherit;
     font-size: 0.85rem;
-    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .project-controls__btn:hover,
 .project-controls__btn:focus-visible {
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.85);
     color: var(--ink);
-    transform: translateY(-1px);
     outline: none;
 }
 
@@ -251,9 +241,7 @@ body {
     position: absolute;
     inset: 0;
     padding: 0.65rem 0.75rem;
-    border: 1px solid var(--rule);
-    background: rgba(255, 255, 255, 0.35);
-    border-radius: 0.35rem;
+    background: transparent;
     opacity: 0;
     transform: translateY(0.4rem) scale(0.985);
     pointer-events: none;
@@ -294,9 +282,8 @@ body {
     width: clamp(4.5rem, 9vw, 5.75rem);
     height: clamp(4.5rem, 9vw, 5.75rem);
     object-fit: cover;
-    border-radius: 0.35rem;
+    border-radius: 0.5rem;
     filter: grayscale(1) contrast(1.05);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 0 0 1px rgba(26, 24, 20, 0.12);
 }
 
 .identity__name {

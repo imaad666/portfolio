@@ -75,18 +75,17 @@
   }
 
   function renderMonths(weeks, monthsEl) {
+    // `weeks` is already in the same order the heatmap columns are drawn in
+    // (newest week first) — do not re-reverse here or labels drift out of
+    // sync with the columns they sit above.
     monthsEl.innerHTML = "";
     let lastMonth = null;
-    const slots = [];
-    let latestDate = null;
-    const orderedWeeks = [...weeks].reverse();
 
-    orderedWeeks.forEach((week) => {
+    weeks.forEach((week) => {
       const firstDay = week.contributionDays.find((d) => d.date);
       const slot = document.createElement("span");
       slot.className = "heatmap-month";
       slot.style.width = "11px";
-      slots.push(slot);
 
       if (firstDay?.date) {
         const label = monthLabel(firstDay.date);
@@ -94,28 +93,10 @@
           slot.textContent = label;
           lastMonth = label;
         }
-
-        const weekLatest = week.contributionDays
-          .filter((d) => d.date)
-          .map((d) => d.date)
-          .sort()
-          .at(-1);
-        if (weekLatest && (!latestDate || weekLatest > latestDate)) {
-          latestDate = weekLatest;
-        }
       }
 
       monthsEl.appendChild(slot);
     });
-
-    // Ensure the latest month is always visible (e.g., August at the end).
-    if (latestDate && slots.length) {
-      const latestMonth = monthLabel(latestDate);
-      const lastSlot = slots[slots.length - 1];
-      if (lastSlot.textContent !== latestMonth) {
-        lastSlot.textContent = latestMonth;
-      }
-    }
 
     monthsEl.hidden = false;
   }
