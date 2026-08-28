@@ -59,18 +59,18 @@ function showMore() {
     const viewMoreContainer = document.querySelector('.view-more-container');
     
     if (additionalProjects && viewMoreContainer) {
-        additionalProjects.style.display = 'block';
-        viewMoreContainer.style.display = 'none';
+        additionalProjects.hidden = false;
+        viewMoreContainer.hidden = true;
     }
 }
 
 function showLess() {
     const additionalProjects = document.getElementById('additionalProjects');
     const viewMoreContainer = document.querySelector('.view-more-container');
-    
+
     if (additionalProjects && viewMoreContainer) {
-        additionalProjects.style.display = 'none';
-        viewMoreContainer.style.display = 'flex';
+        additionalProjects.hidden = true;
+        viewMoreContainer.hidden = false;
     }
 }
 
@@ -223,15 +223,6 @@ setupDarkMode();
 function setupScrollProgress() {
     scrollProgressBar = document.createElement('div');
     scrollProgressBar.className = 'scroll-progress';
-    scrollProgressBar.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 0%;
-        height: 3px;
-        background: #ff0000;
-        z-index: 1000;
-    `;
 
     document.body.appendChild(scrollProgressBar);
 }
