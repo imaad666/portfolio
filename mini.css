@@ -71,7 +71,7 @@ body {
 
 .paper__grain {
     position: absolute;
-    inset: 0;
+    inset: -6%;
     opacity: 0.58;
     mix-blend-mode: multiply;
     background-image:
@@ -81,19 +81,6 @@ body {
     background-size: 150px 150px, 3px 3px, 4px 4px;
     background-position: 0 0, 0 0, 1px 1px;
     animation: grain-drift 16s steps(10) infinite;
-}
-
-.paper__plants {
-    position: absolute;
-    right: -2%;
-    bottom: -4%;
-    width: min(42vw, 280px);
-    height: min(55vh, 360px);
-    opacity: 0.06;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 280' fill='none'%3E%3Cpath d='M98 270c2-48 8-96 4-140' stroke='%231a1814' stroke-width='1.2'/%3E%3Cpath d='M102 150c-28-18-48-8-62 18 22-6 42 2 52 22' stroke='%231a1814' stroke-width='1'/%3E%3Cpath d='M100 120c24-22 46-14 58 12-20 4-38-2-48-18' stroke='%231a1814' stroke-width='1'/%3E%3Cpath d='M96 90c-22-28-8-48 18-58-4 22 4 40 22 48' stroke='%231a1814' stroke-width='1'/%3E%3Cpath d='M104 70c18-32 42-28 52-8-18 8-32 22-40 42' stroke='%231a1814' stroke-width='0.9'/%3E%3Cpath d='M92 200c-30-12-52 4-58 28 24-4 44 6 52 22' stroke='%231a1814' stroke-width='0.9'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: bottom right;
-    background-size: contain;
 }
 
 @keyframes wash-breathe {
@@ -431,10 +418,15 @@ a:focus-visible {
     display: none;
 }
 
+.heatmap-scroll {
+    display: flex;
+    flex-direction: column;
+    min-width: max-content;
+}
+
 .heatmap {
     display: flex;
     gap: 2px;
-    min-width: max-content;
 }
 
 .heatmap-week {
@@ -636,10 +628,6 @@ a:focus-visible {
 
     .project-stack {
         min-height: 7.1rem;
-    }
-
-    .paper__plants {
-        opacity: 0.04;
     }
 }
 
