@@ -113,7 +113,6 @@
       for (let d = 0; d < 7; d++) {
         const cell = document.createElement("div");
         cell.className = "heatmap-day";
-        cell.style.animationDelay = `${w * 0.025}s`;
         weekCol.appendChild(cell);
       }
 
