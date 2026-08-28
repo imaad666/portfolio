@@ -35,10 +35,6 @@
     --tag-bg: #f3f4f6;
     --tag-text: #374151;
     --border-soft: #e5e7eb;
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --glass-bg-1: rgba(255, 255, 255, 0.2);
-    --glass-bg-2: rgba(255, 255, 255, 0.08);
-    --glass-bg-3: rgba(255, 255, 255, 0.03);
     --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -62,10 +58,6 @@ body.dark-mode {
     --tag-bg: #141414;
     --tag-text: #f1f1f1;
     --border-soft: #222222;
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-bg-1: rgba(255, 255, 255, 0.04);
-    --glass-bg-2: rgba(255, 255, 255, 0.02);
-    --glass-bg-3: rgba(255, 255, 255, 0.01);
     --shadow-color: rgba(0, 0, 0, 0.45);
 }
 
@@ -360,8 +352,6 @@ body.dark-mode .contributions-day--empty {
     gap: 0.5rem;
     width: 120px;
     height: 120px;
-    border: none;
-    border-radius: 0;
     background: transparent;
     color: var(--body-color);
     transition: color 0.2s ease, transform 0.2s ease;
@@ -469,6 +459,18 @@ body.dark-mode .contributions-day--empty {
     z-index: 1;
 }
 
+.project-external__live {
+    position: absolute;
+    top: 0;
+    right: 24px;
+}
+
+.project-external__showcase {
+    position: absolute;
+    top: 0;
+    right: 48px;
+}
+
 .project-external a {
     display: block;
     width: 16px;
@@ -550,26 +552,8 @@ body.dark-mode .contributions-day--empty {
     align-items: center;
 }
 
-.view-more-btn {
-    background: #9ca3af;
-    border: 2px solid #9ca3af;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #000000;
-    margin: 0 auto;
-}
-
-.view-more-btn:hover {
-    background: #ffffff;
-    color: #000000;
-    transform: scale(1.1);
-    border-color: #ffffff;
+.view-more-container[hidden] {
+    display: none;
 }
 
 .view-more-btn svg {
@@ -580,6 +564,10 @@ body.dark-mode .contributions-day--empty {
 /* Additional Projects */
 .additional-projects {
     margin-top: 1.25rem;
+}
+
+.additional-projects[hidden] {
+    display: none;
 }
 
 .additional-projects .project-card:last-child {
@@ -673,15 +661,6 @@ body.dark-mode .contributions-day--empty {
     justify-self: end;
 }
 
-
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 2rem 0;
-    color: #6b7280;
-    font-size: 0.875rem;
-}
 
 
 /* Responsive Design */
@@ -794,25 +773,7 @@ html {
     filter: grayscale(0%);
 }
 
-.ethglobal-logo {
-    height: 1.2em;
-    width: auto;
-    object-fit: contain;
-    margin-right: 0.5rem;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.mercatus-logo {
-    height: 1.2em;
-    width: auto;
-    object-fit: contain;
-    margin-right: 0.5rem;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.monad-logo {
+.tech-logo {
     height: 1.2em;
     width: auto;
     object-fit: contain;
@@ -823,11 +784,6 @@ html {
 
 .bob-logo {
     height: 1.4em;
-    width: auto;
-    object-fit: contain;
-    margin-right: 0.5rem;
-    display: inline-block;
-    vertical-align: middle;
 }
 
 .ibm-logo {
@@ -854,15 +810,6 @@ html {
 
 .projects-section .project-card:hover img[class$="-logo"] {
     filter: grayscale(0%);
-}
-
-.codex-logo {
-    height: 1.2em;
-    width: auto;
-    object-fit: contain;
-    margin-right: 0.5rem;
-    display: inline-block;
-    vertical-align: middle;
 }
 
 /* Badges Section */
@@ -977,11 +924,13 @@ html {
     transform: scale(1.05);
 }
 
-/* Footer positioning */
+/* Footer */
 footer {
     text-align: center;
     padding: 2rem 0;
     margin-top: 2rem;
+    color: #6b7280;
+    font-size: 0.875rem;
 }
 
 @media (hover: none),
@@ -994,6 +943,16 @@ footer {
         opacity: 1 !important;
         transform: none !important;
     }
+}
+
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: #ff0000;
+    z-index: 1000;
 }
 
 @media (prefers-reduced-motion: reduce) {
