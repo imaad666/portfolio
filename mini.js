@@ -101,6 +101,31 @@
     monthsEl.hidden = false;
   }
 
+  function renderSkeleton() {
+    const skeletonEl = document.getElementById("heatmap-skeleton");
+    if (!skeletonEl || skeletonEl.childElementCount) return;
+
+    const weekCount = 53;
+    for (let w = 0; w < weekCount; w++) {
+      const weekCol = document.createElement("div");
+      weekCol.className = "heatmap-week";
+
+      for (let d = 0; d < 7; d++) {
+        const cell = document.createElement("div");
+        cell.className = "heatmap-day";
+        cell.style.animationDelay = `${w * 0.025}s`;
+        weekCol.appendChild(cell);
+      }
+
+      skeletonEl.appendChild(weekCol);
+    }
+  }
+
+  function hideSkeleton() {
+    const skeletonEl = document.getElementById("heatmap-skeleton");
+    if (skeletonEl) skeletonEl.classList.add("is-hidden");
+  }
+
   function renderHeatmap({ total, weeks }) {
     const heatmap = document.getElementById("contributions-heatmap");
     const totalEl = document.getElementById("contributions-total");
@@ -114,13 +139,15 @@
     const orderedWeeks = [...weeks].reverse();
     if (monthsEl && orderedWeeks.length) renderMonths(orderedWeeks, monthsEl);
 
-    orderedWeeks.forEach((week) => {
+    orderedWeeks.forEach((week, weekIndex) => {
       const weekCol = document.createElement("div");
       weekCol.className = "heatmap-week";
+      const delay = `${weekIndex * 0.012}s`;
 
       week.contributionDays.forEach((day) => {
         const cell = document.createElement("div");
         cell.className = "heatmap-day";
+        cell.style.animationDelay = delay;
 
         if (day.empty || !day.date) {
           cell.style.visibility = "hidden";
@@ -141,6 +168,7 @@
         const pad = document.createElement("div");
         pad.className = "heatmap-day";
         pad.style.visibility = "hidden";
+        pad.style.animationDelay = delay;
         weekCol.appendChild(pad);
       }
 
@@ -153,6 +181,8 @@
         wrap.scrollLeft = 0;
       });
     }
+
+    hideSkeleton();
   }
 
   async function loadGitHubContributions() {
@@ -162,6 +192,8 @@
     const monthsEl = document.getElementById("heatmap-months");
 
     if (!heatmap || !totalEl || !fallbackEl) return;
+
+    renderSkeleton();
 
     try {
       let payload;
@@ -177,10 +209,16 @@
       fallbackEl.textContent = "Could not load contribution data right now.";
       heatmap.innerHTML = "";
       if (monthsEl) monthsEl.hidden = true;
+      hideSkeleton();
     }
   }
 
   document.addEventListener("DOMContentLoaded", loadGitHubContributions);
+
+  function hideBadgeSkeleton() {
+    const skeletonEl = document.getElementById("badge-skeleton");
+    if (skeletonEl) skeletonEl.classList.add("is-hidden");
+  }
 
   async function loadCredlyBadges() {
     const stack = document.getElementById("badge-stack");
@@ -196,6 +234,7 @@
 
       const top = (data.badges || []).slice(0, 3);
       stack.innerHTML = "";
+      hideBadgeSkeleton();
 
       if (!top.length) {
         fallbackEl.hidden = false;
@@ -203,9 +242,10 @@
         return;
       }
 
-      top.forEach((badge) => {
+      top.forEach((badge, index) => {
         const link = document.createElement("a");
         link.className = "badge-stack__item";
+        link.style.animationDelay = `${index * 0.08}s`;
         link.href = badge.url;
         link.target = "_blank";
         link.rel = "noopener noreferrer";
@@ -220,6 +260,7 @@
         stack.appendChild(link);
       });
     } catch (error) {
+      hideBadgeSkeleton();
       fallbackEl.hidden = false;
       fallbackEl.textContent = "Could not load badges right now.";
       stack.innerHTML = "";

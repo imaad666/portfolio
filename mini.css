@@ -178,6 +178,10 @@ body {
     animation-delay: 0.24s;
 }
 
+.tile--badges .tile__head {
+    justify-content: flex-start;
+}
+
 .tile--projects {
     grid-area: projects;
     animation-delay: 0.34s;
@@ -187,7 +191,7 @@ body {
     grid-area: cta;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: center;
     animation-delay: 0.48s;
 }
 
@@ -208,15 +212,23 @@ body {
 
 .project-arrow {
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
     border: none;
     background: transparent;
     color: var(--muted);
-    line-height: 1;
     padding: 0;
     cursor: pointer;
-    font: inherit;
-    font-size: 0.95rem;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.project-arrow svg {
+    display: block;
+    width: 0.85rem;
+    height: 0.85rem;
 }
 
 .project-arrow:hover,
@@ -225,9 +237,23 @@ body {
     outline: none;
 }
 
+.project-arrow--prev:hover,
+.project-arrow--prev:focus-visible {
+    transform: translateX(-2px);
+}
+
+.project-arrow--next:hover,
+.project-arrow--next:focus-visible {
+    transform: translateX(2px);
+}
+
 .project-arrow:disabled {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: default;
+}
+
+.project-arrow:disabled:hover {
+    transform: none;
 }
 
 .project-stack__item {
@@ -267,6 +293,25 @@ body {
     .tile {
         opacity: 1;
         transform: none;
+    }
+
+    .heatmap-skeleton .heatmap-day {
+        animation: none;
+    }
+
+    .heatmap .heatmap-day {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .badge-skeleton__dot {
+        animation: none;
+    }
+
+    .badge-stack > .badge-stack__item {
+        animation: none;
+        opacity: 1;
     }
 }
 
@@ -360,7 +405,7 @@ a:focus-visible {
 .proof__row {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 0.5rem;
 }
 
@@ -430,9 +475,56 @@ a:focus-visible {
     min-width: max-content;
 }
 
+.heatmap-body {
+    position: relative;
+    min-height: 75px;
+}
+
+.heatmap-skeleton {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    gap: 2px;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.heatmap-skeleton.is-hidden {
+    opacity: 0;
+}
+
+.heatmap-skeleton .heatmap-day {
+    background: var(--heat-1);
+    animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
 .heatmap {
     display: flex;
     gap: 2px;
+    position: relative;
+}
+
+.heatmap .heatmap-day {
+    opacity: 0;
+    transform: scale(0.5);
+    animation: heatmap-day-in 0.4s ease forwards;
+}
+
+@keyframes heatmap-day-in {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .heatmap-week {
@@ -472,11 +564,46 @@ a:focus-visible {
 }
 
 /* —— Badge stack —— */
-.badge-stack {
+.badge-stack-body {
     position: relative;
     width: 100%;
     height: 4.75rem;
     margin-top: 0.35rem;
+}
+
+.badge-stack {
+    position: absolute;
+    inset: 0;
+}
+
+.badge-skeleton {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.badge-skeleton.is-hidden {
+    opacity: 0;
+}
+
+.badge-stack__item.badge-skeleton__dot {
+    border-radius: 50%;
+    background: var(--heat-1);
+    filter: none;
+    animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+.badge-skeleton__dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.badge-skeleton__dot:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.badge-skeleton__dot:nth-child(3) {
+    animation-delay: 0.3s;
 }
 
 .badge-stack__item {
@@ -493,6 +620,17 @@ a:focus-visible {
         transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
         filter 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
+}
+
+.badge-stack > .badge-stack__item {
+    opacity: 0;
+    animation: badge-in 0.4s ease forwards;
+}
+
+@keyframes badge-in {
+    to {
+        opacity: 1;
+    }
 }
 
 .badge-stack__item img {
@@ -598,7 +736,7 @@ a:focus-visible {
 
     .tile--cta {
         align-items: flex-start;
-        justify-content: flex-end;
+        justify-content: center;
     }
 
     .project-stack {
