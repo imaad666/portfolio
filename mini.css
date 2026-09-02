@@ -89,7 +89,6 @@ body {
     background-image: url("assets/grain.png?v=1");
     background-size: 64px 64px;
     background-repeat: repeat;
-    animation: grain-drift 16s steps(10) infinite;
 }
 
 .paper__vignette {
