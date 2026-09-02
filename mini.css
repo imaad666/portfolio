@@ -596,12 +596,10 @@ a:focus-visible {
 }
 
 .badge-stack__item.badge-skeleton__dot {
-    border-radius: 50%;
     background: var(--heat-1);
     filter: none;
-    overflow: hidden;
-    -webkit-mask-image: radial-gradient(circle, #000 0%, #000 45%, transparent 92%);
-    mask-image: radial-gradient(circle, #000 0%, #000 45%, transparent 92%);
+    -webkit-mask-image: radial-gradient(circle, #000 0%, #000 15%, transparent 62%);
+    mask-image: radial-gradient(circle, #000 0%, #000 15%, transparent 62%);
 }
 
 .badge-skeleton__dot::after {
