@@ -113,24 +113,6 @@ body {
     }
 }
 
-@keyframes grain-drift {
-    0% {
-        transform: translate3d(0, 0, 0);
-    }
-    25% {
-        transform: translate3d(-1.5%, 1%, 0);
-    }
-    50% {
-        transform: translate3d(1%, -1.5%, 0);
-    }
-    75% {
-        transform: translate3d(-0.5%, -0.5%, 0);
-    }
-    100% {
-        transform: translate3d(0, 0, 0);
-    }
-}
-
 /* —— Sheet / bento —— */
 .sheet {
     position: relative;
@@ -617,6 +599,8 @@ a:focus-visible {
     background: var(--heat-1);
     filter: none;
     overflow: hidden;
+    -webkit-mask-image: radial-gradient(circle, #000 0%, #000 45%, transparent 92%);
+    mask-image: radial-gradient(circle, #000 0%, #000 45%, transparent 92%);
 }
 
 .badge-skeleton__dot::after {
