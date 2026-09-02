@@ -262,18 +262,19 @@ body {
     padding: 0.65rem 0.75rem;
     background: transparent;
     opacity: 0;
-    transform: translateY(0.15rem);
+    transform: translateY(0.2rem);
     pointer-events: none;
     transition:
-        opacity 0.35s ease,
-        transform 0.35s ease;
+        opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .project-stack__item.is-active {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     pointer-events: auto;
     z-index: 2;
+    transition-delay: 0.15s;
 }
 
 @keyframes rise-in {
