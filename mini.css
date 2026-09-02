@@ -84,14 +84,11 @@ body {
 .paper__grain {
     position: absolute;
     inset: -6%;
-    opacity: 0.58;
+    opacity: 0.5;
     mix-blend-mode: multiply;
-    background-image:
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.11 0 0 0 0 0.10 0 0 0 0 0.08 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
-        radial-gradient(circle at 20% 15%, rgba(20, 18, 16, 0.06) 0 1px, transparent 1px),
-        radial-gradient(circle at 80% 70%, rgba(20, 18, 16, 0.05) 0 1px, transparent 1px);
-    background-size: 150px 150px, 3px 3px, 4px 4px;
-    background-position: 0 0, 0 0, 1px 1px;
+    background-image: url("assets/grain.png?v=1");
+    background-size: 64px 64px;
+    background-repeat: repeat;
     animation: grain-drift 16s steps(10) infinite;
 }
 
@@ -284,11 +281,11 @@ body {
     padding: 0.65rem 0.75rem;
     background: transparent;
     opacity: 0;
-    transform: translateY(0.4rem) scale(0.985);
+    transform: translateY(0.15rem);
     pointer-events: none;
     transition:
-        opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity 0.35s ease,
+        transform 0.35s ease;
 }
 
 .project-stack__item.is-active {
