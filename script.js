@@ -1,394 +1,293 @@
-// Portfolio Website JavaScript
+(function () {
+  const LOGIN = "imaad666";
+  const LEVELS = [
+    null,
+    "heatmap-day--l1",
+    "heatmap-day--l2",
+    "heatmap-day--l3",
+    "heatmap-day--l4",
+  ];
 
-// Time Display Functionality
-function updateTimeDisplay() {
-    // Get current time in IST (UTC+5:30)
-    const now = new Date();
-    
-    // Convert to IST by using toLocaleString with Asia/Kolkata timezone
-    const istTimeString = now.toLocaleString('en-US', {
-        timeZone: 'Asia/Kolkata',
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    }) + ' IST';
-    
-    // Update IST time display
-    const istTimeElement = document.getElementById('ist-time');
-    if (istTimeElement) {
-        istTimeElement.textContent = istTimeString;
+  function levelClass(level, count) {
+    if (typeof level === "number" && level >= 0) {
+      return LEVELS[Math.min(level, 4)];
     }
-    
-    // Calculate time difference
-    const userOffset = -now.getTimezoneOffset(); // User's offset in minutes from UTC
-    const istOffsetMinutes = 5.5 * 60; // IST offset in minutes
-    const diffMinutes = istOffsetMinutes - userOffset;
-    const diffHours = Math.abs(diffMinutes / 60);
-    
-    let timeDiffText = '';
-    if (diffMinutes === 0) {
-        timeDiffText = "We're in the same timezone!";
-    } else {
-        const ahead = diffMinutes > 0;
-        const hoursPart = Math.floor(diffHours);
-        const minutesPart = Math.abs(diffMinutes % 60);
-        
-        if (minutesPart === 0) {
-            timeDiffText = `I'm ${hoursPart} hour${hoursPart !== 1 ? 's' : ''} ${ahead ? 'ahead of' : 'behind'} you`;
-        } else if (minutesPart === 30) {
-            timeDiffText = `I'm ${hoursPart}.5 hours ${ahead ? 'ahead of' : 'behind'} you`;
-        } else {
-            timeDiffText = `I'm ${hoursPart}h ${minutesPart}m ${ahead ? 'ahead of' : 'behind'} you`;
-        }
+    if (!count) return null;
+    if (count <= 2) return LEVELS[1];
+    if (count <= 5) return LEVELS[2];
+    if (count <= 10) return LEVELS[3];
+    return LEVELS[4];
+  }
+
+  function daysToWeeks(days) {
+    const weeks = [];
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push({
+        contributionDays: days.slice(i, i + 7).map((d) => ({
+          date: d.date,
+          contributionCount: d.count ?? d.contributionCount ?? 0,
+          level: d.level,
+        })),
+      });
     }
-    
-    const timeDiffElement = document.getElementById('time-difference');
-    if (timeDiffElement) {
-        timeDiffElement.textContent = timeDiffText;
+    return weeks;
+  }
+
+  function padWeeksToSunday(days) {
+    if (!days.length) return days;
+    const first = new Date(days[0].date + "T00:00:00");
+    const weekday = first.getDay(); // 0 Sun
+    const padded = [];
+    for (let i = 0; i < weekday; i++) {
+      padded.push({ date: "", count: 0, level: 0, empty: true });
     }
-}
+    return padded.concat(days);
+  }
 
-// Update time immediately and then every second
-updateTimeDisplay();
-setInterval(updateTimeDisplay, 1000);
-
-// View More/Less Projects Functionality
-function showMore() {
-    const additionalProjects = document.getElementById('additionalProjects');
-    const viewMoreContainer = document.querySelector('.view-more-container');
-    
-    if (additionalProjects && viewMoreContainer) {
-        additionalProjects.hidden = false;
-        viewMoreContainer.hidden = true;
+  async function fetchLocal() {
+    const response = await fetch("/api/github-contributions");
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || data.error || "Local API failed");
     }
-}
-
-function showLess() {
-    const additionalProjects = document.getElementById('additionalProjects');
-    const viewMoreContainer = document.querySelector('.view-more-container');
-
-    if (additionalProjects && viewMoreContainer) {
-        additionalProjects.hidden = true;
-        viewMoreContainer.hidden = false;
-    }
-}
-
-// Make functions globally accessible
-window.showMore = showMore;
-window.showLess = showLess;
-
-// Fade in animation for sections
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// Observe all sections
-document.addEventListener('DOMContentLoaded', () => {
-    const sections = document.querySelectorAll('section:not(.profile-section), .projects-grid, .tech-grid, .education-grid, .contact-links');
-    sections.forEach(section => {
-        if (prefersReducedMotion) {
-            section.style.opacity = '1';
-            section.style.transform = 'none';
-            return;
-        }
-
-        section.style.opacity = '0';
-        section.style.transform = 'translateY(20px)';
-        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(section);
-    });
-});
-
-
-// Shared scroll handler (parallax + progress bar) to avoid jank from multiple listeners
-const profileSection = document.querySelector('.profile-section');
-let scrollProgressBar = null;
-let scrollTicking = false;
-
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-                 ('ontouchstart' in window) ||
-                 (navigator.maxTouchPoints > 0);
-
-function handleScrollFrame() {
-    if (profileSection && !isMobile && !prefersReducedMotion) {
-        const rate = window.pageYOffset * -0.18;
-        profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
-    }
-
-    if (scrollProgressBar) {
-        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-        const scrolled = maxScroll > 0 ? (window.pageYOffset / maxScroll) * 100 : 0;
-        scrollProgressBar.style.width = `${scrolled}%`;
-    }
-
-    scrollTicking = false;
-}
-
-window.addEventListener('scroll', () => {
-    if (scrollTicking) {
-        return;
-    }
-
-    scrollTicking = true;
-    window.requestAnimationFrame(handleScrollFrame);
-}, { passive: true });
-
-// Add loading animation
-window.addEventListener('load', function() {
-    document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity 0.5s ease';
-    
-    setTimeout(() => {
-        document.body.style.opacity = '1';
-    }, 100);
-});
-
-// Add keyboard navigation support
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Tab') {
-        // Add focus indicators for keyboard navigation
-        document.body.classList.add('keyboard-navigation');
-    }
-});
-
-document.addEventListener('mousedown', function() {
-    // Remove keyboard navigation indicators when using mouse
-    document.body.classList.remove('keyboard-navigation');
-});
-
-
-// Add dark mode toggle
-function setupDarkMode() {
-    const darkModeToggle = document.querySelector('#theme-toggle');
-    if (!darkModeToggle) {
-        return;
-    }
-
-    const sunIcon = `
-        <circle cx="12" cy="12" r="4"></circle>
-        <path d="M12 2.5v2.5"></path>
-        <path d="M12 19v2.5"></path>
-        <path d="m4.93 4.93 1.77 1.77"></path>
-        <path d="m17.3 17.3 1.77 1.77"></path>
-        <path d="M2.5 12H5"></path>
-        <path d="M19 12h2.5"></path>
-        <path d="m4.93 19.07 1.77-1.77"></path>
-        <path d="m17.3 6.7 1.77-1.77"></path>
-    `;
-    const moonIcon = `
-        <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 1 0 9.8 9.8Z"></path>
-    `;
-
-    const applyTheme = (isDarkMode) => {
-        document.body.classList.toggle('dark-mode', isDarkMode);
-        darkModeToggle.setAttribute('aria-pressed', String(isDarkMode));
-        darkModeToggle.setAttribute('aria-label', isDarkMode ? 'Switch to light mode' : 'Switch to night mode');
-        darkModeToggle.innerHTML = `
-            <svg class="theme-toggle__icon theme-toggle__icon--${isDarkMode ? 'moon' : 'sun'}" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                ${isDarkMode ? moonIcon : sunIcon}
-            </svg>
-        `;
+    return {
+      total: data.totalContributions,
+      weeks: data.weeks,
     };
+  }
 
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode !== null) {
-        applyTheme(savedDarkMode === 'true');
+  async function fetchPublic() {
+    const response = await fetch(
+      `https://github-contributions-api.jogruber.de/v4/${LOGIN}?y=last`
+    );
+    if (!response.ok) throw new Error("Public contributions API failed");
+    const data = await response.json();
+    const days = padWeeksToSunday(data.contributions || []);
+    return {
+      total: data.total?.lastYear ?? 0,
+      weeks: daysToWeeks(days),
+    };
+  }
+
+  function renderSkeleton() {
+    const skeletonEl = document.getElementById("heatmap-skeleton");
+    if (!skeletonEl || skeletonEl.childElementCount) return;
+
+    const weekCount = 53;
+    for (let w = 0; w < weekCount; w++) {
+      const weekCol = document.createElement("div");
+      weekCol.className = "heatmap-week";
+
+      for (let d = 0; d < 7; d++) {
+        const cell = document.createElement("div");
+        cell.className = "heatmap-day";
+        weekCol.appendChild(cell);
+      }
+
+      skeletonEl.appendChild(weekCol);
     }
+  }
 
-    darkModeToggle.addEventListener('click', function() {
-        const isDarkMode = !document.body.classList.contains('dark-mode');
-        applyTheme(isDarkMode);
-        localStorage.setItem('darkMode', String(isDarkMode));
+  function hideSkeleton() {
+    const skeletonEl = document.getElementById("heatmap-skeleton");
+    if (skeletonEl) skeletonEl.classList.add("is-hidden");
+  }
+
+  function renderHeatmap({ total, weeks }) {
+    const heatmap = document.getElementById("contributions-heatmap");
+    const totalEl = document.getElementById("contributions-total");
+    const fallbackEl = document.getElementById("contributions-fallback");
+
+    totalEl.textContent = `${Number(total).toLocaleString()} in the last year`;
+    fallbackEl.hidden = true;
+    heatmap.innerHTML = "";
+
+    const orderedWeeks = [...weeks].reverse();
+
+    orderedWeeks.forEach((week, weekIndex) => {
+      const weekCol = document.createElement("div");
+      weekCol.className = "heatmap-week";
+      const delay = `${weekIndex * 0.012}s`;
+
+      week.contributionDays.forEach((day) => {
+        const cell = document.createElement("div");
+        cell.className = "heatmap-day";
+        cell.style.animationDelay = delay;
+
+        if (day.empty || !day.date) {
+          cell.style.visibility = "hidden";
+        } else {
+          const cls = levelClass(day.level, day.contributionCount);
+          if (cls) cell.classList.add(cls);
+          cell.title = `${day.date}: ${day.contributionCount} contribution${
+            day.contributionCount === 1 ? "" : "s"
+          }`;
+          cell.setAttribute("aria-label", cell.title);
+        }
+
+        weekCol.appendChild(cell);
+      });
+
+      // Ensure 7 rows even if week is short
+      while (weekCol.children.length < 7) {
+        const pad = document.createElement("div");
+        pad.className = "heatmap-day";
+        pad.style.visibility = "hidden";
+        pad.style.animationDelay = delay;
+        weekCol.appendChild(pad);
+      }
+
+      heatmap.appendChild(weekCol);
     });
-}
 
-// Initialize dark mode if toggle exists
-setupDarkMode();
-
-// Add scroll progress indicator
-function setupScrollProgress() {
-    scrollProgressBar = document.createElement('div');
-    scrollProgressBar.className = 'scroll-progress';
-
-    document.body.appendChild(scrollProgressBar);
-}
-
-// Initialize scroll progress
-setupScrollProgress();
-
-// GitHub contribution heatmap (fetched via serverless API; token stays in Vercel env)
-async function loadGitHubContributions() {
-    const heatmap = document.getElementById('contributions-heatmap');
-    const totalEl = document.getElementById('contributions-total');
-    const fallbackEl = document.getElementById('contributions-fallback');
-
-    if (!heatmap || !totalEl || !fallbackEl) {
-        return;
+    const wrap = heatmap.parentElement;
+    if (wrap) {
+      requestAnimationFrame(() => {
+        wrap.scrollLeft = 0;
+      });
     }
+
+    hideSkeleton();
+  }
+
+  async function loadGitHubContributions() {
+    const heatmap = document.getElementById("contributions-heatmap");
+    const totalEl = document.getElementById("contributions-total");
+    const fallbackEl = document.getElementById("contributions-fallback");
+
+    if (!heatmap || !totalEl || !fallbackEl) return;
+
+    renderSkeleton();
 
     try {
-        const response = await fetch('/api/github-contributions');
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || data.error || 'Could not load contributions');
-        }
-
-        totalEl.textContent = `${data.totalContributions.toLocaleString()} contributions in the last year`;
-        heatmap.innerHTML = '';
-
-        data.weeks.forEach((week) => {
-            const weekCol = document.createElement('div');
-            weekCol.className = 'contributions-week';
-
-            week.contributionDays.forEach((day) => {
-                const cell = document.createElement('div');
-                cell.className = 'contributions-day';
-                if (day.contributionCount === 0) {
-                    cell.classList.add('contributions-day--empty');
-                } else {
-                    cell.style.backgroundColor = day.color;
-                }
-                cell.title = `${day.date}: ${day.contributionCount} contribution${day.contributionCount === 1 ? '' : 's'}`;
-                cell.setAttribute('aria-label', cell.title);
-                weekCol.appendChild(cell);
-            });
-
-            heatmap.appendChild(weekCol);
-        });
-
-        const wrap = heatmap.parentElement;
-        if (wrap) {
-            requestAnimationFrame(() => {
-                wrap.scrollLeft = wrap.scrollWidth;
-            });
-        }
+      let payload;
+      try {
+        payload = await fetchLocal();
+      } catch {
+        payload = await fetchPublic();
+      }
+      renderHeatmap(payload);
     } catch (error) {
-        totalEl.textContent = 'GitHub activity unavailable';
-        fallbackEl.hidden = false;
-        fallbackEl.textContent = 'Could not load contribution data right now.';
-        heatmap.innerHTML = '';
+      totalEl.textContent = "unavailable";
+      fallbackEl.hidden = false;
+      fallbackEl.textContent = "Could not load contribution data right now.";
+      heatmap.innerHTML = "";
+      hideSkeleton();
     }
-}
+  }
 
-document.addEventListener('DOMContentLoaded', loadGitHubContributions);
+  document.addEventListener("DOMContentLoaded", loadGitHubContributions);
 
-async function loadCredlyBadges() {
-    const grid = document.getElementById('badges-grid');
-    const countEl = document.getElementById('badges-count');
-    const fallbackEl = document.getElementById('badges-fallback');
+  function hideBadgeSkeleton() {
+    const skeletonEl = document.getElementById("badge-skeleton");
+    if (skeletonEl) skeletonEl.classList.add("is-hidden");
+  }
 
-    if (!grid || !countEl || !fallbackEl) {
-        return;
-    }
+  async function loadCredlyBadges() {
+    const stack = document.getElementById("badge-stack");
+    const fallbackEl = document.getElementById("badges-fallback");
+    if (!stack || !fallbackEl) return;
 
     try {
-        const response = await fetch('/api/credly-badges');
-        const data = await response.json();
+      const response = await fetch("/api/credly-badges");
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Could not load badges");
+      }
 
-        if (!response.ok) {
-            throw new Error(data.message || data.error || 'Could not load badges');
-        }
+      const top = (data.badges || []).slice(0, 3);
+      stack.innerHTML = "";
+      hideBadgeSkeleton();
 
-        countEl.textContent = `${data.count} verified badge${data.count === 1 ? '' : 's'} on Credly`;
-        grid.innerHTML = '';
-
-        data.badges.forEach((badge) => {
-            const link = document.createElement('a');
-            link.className = 'badge-card';
-            link.href = badge.url;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.title = badge.issuer ? `${badge.name} — ${badge.issuer}` : badge.name;
-
-            const img = document.createElement('img');
-            img.src = badge.image;
-            img.alt = badge.name;
-            img.loading = 'lazy';
-            img.className = 'badge-card__image';
-
-            link.appendChild(img);
-            grid.appendChild(link);
-        });
-    } catch (error) {
-        countEl.textContent = 'Certifications and badges';
+      if (!top.length) {
         fallbackEl.hidden = false;
-        fallbackEl.textContent = 'Could not load badges right now.';
-        grid.innerHTML = '';
+        fallbackEl.textContent = "No public badges yet.";
+        return;
+      }
+
+      top.forEach((badge, index) => {
+        const link = document.createElement("a");
+        link.className = "badge-stack__item";
+        link.style.animationDelay = `${index * 0.08}s`;
+        link.href = badge.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.title = badge.issuer ? `${badge.name} — ${badge.issuer}` : badge.name;
+
+        const img = document.createElement("img");
+        img.src = badge.image;
+        img.alt = badge.name;
+        img.loading = "lazy";
+
+        link.appendChild(img);
+        stack.appendChild(link);
+      });
+    } catch (error) {
+      hideBadgeSkeleton();
+      fallbackEl.hidden = false;
+      fallbackEl.textContent = "Could not load badges right now.";
+      stack.innerHTML = "";
     }
-}
+  }
 
-document.addEventListener('DOMContentLoaded', loadCredlyBadges);
+  document.addEventListener("DOMContentLoaded", loadCredlyBadges);
 
-// Footer button and circular favicon
-document.addEventListener('DOMContentLoaded', () => {
-    // Build a circular PNG favicon from the full profile photo at runtime
-    function setCircularFavicon(src) {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-            const size = 64;
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, size, size);
-            ctx.beginPath();
-            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.clip();
+  function initProjectCarousel() {
+    const items = Array.from(document.querySelectorAll(".project-stack__item"));
+    if (!items.length) return;
+    const prevBtn = document.getElementById("project-prev");
+    const nextBtn = document.getElementById("project-next");
 
-            // Cover crop of the full image so the whole body is visible
-            const scale = Math.max(size / img.width, size / img.height);
-            const w = img.width * scale;
-            const h = img.height * scale;
-            const x = (size - w) / 2;
-            const y = (size - h) / 2;
-            ctx.drawImage(img, x, y, w, h);
+    let index = 0;
+    let timerId = null;
 
-            const url = canvas.toDataURL('image/png');
-            let link = document.querySelector('link[rel="icon"]');
-            if (!link) {
-                link = document.createElement('link');
-                link.rel = 'icon';
-                document.head.appendChild(link);
-            }
-            link.type = 'image/png';
-            link.href = url;
-            let shortcut = document.querySelector('link[rel="shortcut icon"]');
-            if (shortcut) {
-                shortcut.type = 'image/png';
-                shortcut.href = url;
-            }
-        };
-        img.src = src + (src.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    function setActive(nextIndex) {
+      items.forEach((item, i) => {
+        const active = i === nextIndex;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-hidden", String(!active));
+      });
     }
 
-    setCircularFavicon('assets/imaad.jpg');
-
-    // Glass Button Scroll to Top Functionality
-    const glassButton = document.querySelector('.glass-button');
-    if (glassButton) {
-        glassButton.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
+    function next() {
+      index = (index + 1) % items.length;
+      setActive(index);
     }
-});
 
+    function prev() {
+      index = (index - 1 + items.length) % items.length;
+      setActive(index);
+    }
+
+    function startAutoRotate() {
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(next, 5000);
+    }
+
+    setActive(index);
+
+    if (items.length === 1) {
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
+      return;
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        prev();
+        startAutoRotate();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        next();
+        startAutoRotate();
+      });
+    }
+
+    startAutoRotate();
+  }
+
+  document.addEventListener("DOMContentLoaded", initProjectCarousel);
+})();
