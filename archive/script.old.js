@@ -1,0 +1,399 @@
+// Portfolio Website JavaScript
+
+// Time Display Functionality
+function updateTimeDisplay() {
+    // Get current time in IST (UTC+5:30)
+    const now = new Date();
+    
+    // Convert to IST by using toLocaleString with Asia/Kolkata timezone
+    const istTimeString = now.toLocaleString('en-US', {
+        timeZone: 'Asia/Kolkata',
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }) + ' IST';
+    
+    // Update IST time display
+    const istTimeElement = document.getElementById('ist-time');
+    if (istTimeElement) {
+        istTimeElement.textContent = istTimeString;
+    }
+    
+    // Calculate time difference
+    const userOffset = -now.getTimezoneOffset(); // User's offset in minutes from UTC
+    const istOffsetMinutes = 5.5 * 60; // IST offset in minutes
+    const diffMinutes = istOffsetMinutes - userOffset;
+    const diffHours = Math.abs(diffMinutes / 60);
+    
+    let timeDiffText = '';
+    if (diffMinutes === 0) {
+        timeDiffText = "We're in the same timezone!";
+    } else {
+        const ahead = diffMinutes > 0;
+        const hoursPart = Math.floor(diffHours);
+        const minutesPart = Math.abs(diffMinutes % 60);
+        
+        if (minutesPart === 0) {
+            timeDiffText = `I'm ${hoursPart} hour${hoursPart !== 1 ? 's' : ''} ${ahead ? 'ahead of' : 'behind'} you`;
+        } else if (minutesPart === 30) {
+            timeDiffText = `I'm ${hoursPart}.5 hours ${ahead ? 'ahead of' : 'behind'} you`;
+        } else {
+            timeDiffText = `I'm ${hoursPart}h ${minutesPart}m ${ahead ? 'ahead of' : 'behind'} you`;
+        }
+    }
+    
+    const timeDiffElement = document.getElementById('time-difference');
+    if (timeDiffElement) {
+        timeDiffElement.textContent = timeDiffText;
+    }
+}
+
+// Update time immediately and then every second
+updateTimeDisplay();
+setInterval(updateTimeDisplay, 1000);
+
+// View More/Less Projects Functionality
+function showMore() {
+    const additionalProjects = document.getElementById('additionalProjects');
+    const viewMoreContainer = document.querySelector('.view-more-container');
+    
+    if (additionalProjects && viewMoreContainer) {
+        additionalProjects.hidden = false;
+        viewMoreContainer.hidden = true;
+    }
+}
+
+function showLess() {
+    const additionalProjects = document.getElementById('additionalProjects');
+    const viewMoreContainer = document.querySelector('.view-more-container');
+
+    if (additionalProjects && viewMoreContainer) {
+        additionalProjects.hidden = true;
+        viewMoreContainer.hidden = false;
+    }
+}
+
+// Make functions globally accessible
+window.showMore = showMore;
+window.showLess = showLess;
+
+// Fade in animation for sections
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
+        }
+    });
+}, observerOptions);
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Observe all sections
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = document.querySelectorAll('section:not(.profile-section), .projects-grid, .tech-grid, .education-grid, .contact-links');
+    sections.forEach(section => {
+        if (prefersReducedMotion) {
+            section.style.opacity = '1';
+            section.style.transform = 'none';
+            return;
+        }
+
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(section);
+    });
+});
+
+
+// Shared scroll handler (parallax + progress bar) to avoid jank from multiple listeners
+const profileSection = document.querySelector('.profile-section');
+let scrollProgressBar = null;
+let scrollTicking = false;
+
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+                 ('ontouchstart' in window) ||
+                 (navigator.maxTouchPoints > 0);
+
+function handleScrollFrame() {
+    if (profileSection && !isMobile && !prefersReducedMotion) {
+        const rate = window.pageYOffset * -0.18;
+        profileSection.style.transform = `translate3d(0, ${rate}px, 0)`;
+    }
+
+    if (scrollProgressBar) {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const scrolled = maxScroll > 0 ? (window.pageYOffset / maxScroll) * 100 : 0;
+        scrollProgressBar.style.width = `${scrolled}%`;
+    }
+
+    scrollTicking = false;
+}
+
+window.addEventListener('scroll', () => {
+    if (scrollTicking) {
+        return;
+    }
+
+    scrollTicking = true;
+    window.requestAnimationFrame(handleScrollFrame);
+}, { passive: true });
+
+// Add loading animation
+window.addEventListener('load', function() {
+    document.body.style.opacity = '0';
+    document.body.style.transition = 'opacity 0.5s ease';
+    
+    setTimeout(() => {
+        document.body.style.opacity = '1';
+    }, 100);
+});
+
+// Add keyboard navigation support
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        // Add focus indicators for keyboard navigation
+        document.body.classList.add('keyboard-navigation');
+    }
+});
+
+document.addEventListener('mousedown', function() {
+    // Remove keyboard navigation indicators when using mouse
+    document.body.classList.remove('keyboard-navigation');
+});
+
+
+// Add dark mode toggle
+function setupDarkMode() {
+    const darkModeToggle = document.querySelector('#theme-toggle');
+    if (!darkModeToggle) {
+        return;
+    }
+
+    const sunIcon = `
+        <circle cx="12" cy="12" r="4"></circle>
+        <path d="M12 2.5v2.5"></path>
+        <path d="M12 19v2.5"></path>
+        <path d="m4.93 4.93 1.77 1.77"></path>
+        <path d="m17.3 17.3 1.77 1.77"></path>
+        <path d="M2.5 12H5"></path>
+        <path d="M19 12h2.5"></path>
+        <path d="m4.93 19.07 1.77-1.77"></path>
+        <path d="m17.3 6.7 1.77-1.77"></path>
+    `;
+    const moonIcon = `
+        <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 1 0 9.8 9.8Z"></path>
+    `;
+
+    const applyTheme = (isDarkMode) => {
+        document.body.classList.toggle('dark-mode', isDarkMode);
+        darkModeToggle.setAttribute('aria-pressed', String(isDarkMode));
+        darkModeToggle.setAttribute('aria-label', isDarkMode ? 'Switch to light mode' : 'Switch to night mode');
+        darkModeToggle.innerHTML = `
+            <svg class="theme-toggle__icon theme-toggle__icon--${isDarkMode ? 'moon' : 'sun'}" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                ${isDarkMode ? moonIcon : sunIcon}
+            </svg>
+        `;
+    };
+
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode !== null) {
+        applyTheme(savedDarkMode === 'true');
+    }
+
+    darkModeToggle.addEventListener('click', function() {
+        const isDarkMode = !document.body.classList.contains('dark-mode');
+        applyTheme(isDarkMode);
+        localStorage.setItem('darkMode', String(isDarkMode));
+    });
+}
+
+// Initialize dark mode if toggle exists
+setupDarkMode();
+
+// Add scroll progress indicator
+function setupScrollProgress() {
+    scrollProgressBar = document.createElement('div');
+    scrollProgressBar.className = 'scroll-progress';
+
+    document.body.appendChild(scrollProgressBar);
+}
+
+// Initialize scroll progress
+setupScrollProgress();
+
+// GitHub contribution heatmap (fetched via serverless API; token stays in Vercel env)
+async function loadGitHubContributions() {
+    const heatmap = document.getElementById('contributions-heatmap');
+    const totalEl = document.getElementById('contributions-total');
+    const fallbackEl = document.getElementById('contributions-fallback');
+
+    if (!heatmap || !totalEl || !fallbackEl) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/github-contributions');
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Could not load contributions');
+        }
+
+        totalEl.textContent = `${data.totalContributions.toLocaleString()} contributions in the last year`;
+        heatmap.innerHTML = '';
+
+        data.weeks.forEach((week) => {
+            const weekCol = document.createElement('div');
+            weekCol.className = 'contributions-week';
+
+            week.contributionDays.forEach((day) => {
+                const cell = document.createElement('div');
+                cell.className = 'contributions-day';
+                if (day.contributionCount === 0) {
+                    cell.classList.add('contributions-day--empty');
+                } else {
+                    cell.style.backgroundColor = day.color;
+                }
+                cell.title = `${day.date}: ${day.contributionCount} contribution${day.contributionCount === 1 ? '' : 's'}`;
+                cell.setAttribute('aria-label', cell.title);
+                weekCol.appendChild(cell);
+            });
+
+            heatmap.appendChild(weekCol);
+        });
+
+        const wrap = heatmap.parentElement;
+        if (wrap) {
+            requestAnimationFrame(() => {
+                wrap.scrollLeft = wrap.scrollWidth;
+            });
+        }
+    } catch (error) {
+        totalEl.textContent = 'GitHub activity unavailable';
+        fallbackEl.hidden = false;
+        fallbackEl.textContent = 'Could not load contribution data right now.';
+        heatmap.innerHTML = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadGitHubContributions);
+
+async function loadCredlyBadges() {
+    const grid = document.getElementById('badges-grid');
+    const countEl = document.getElementById('badges-count');
+    const fallbackEl = document.getElementById('badges-fallback');
+
+    if (!grid || !countEl || !fallbackEl) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/credly-badges');
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || data.error || 'Could not load badges');
+        }
+
+        countEl.textContent = `${data.count} verified badge${data.count === 1 ? '' : 's'} on Credly`;
+        grid.innerHTML = '';
+
+        const makeBadgeEl = (badge) => {
+            const link = document.createElement('a');
+            link.className = 'badge-card';
+            link.href = badge.url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.title = badge.issuer ? `${badge.name} — ${badge.issuer}` : badge.name;
+
+            const img = document.createElement('img');
+            img.src = badge.image;
+            img.alt = badge.name;
+            img.loading = 'lazy';
+            img.className = 'badge-card__image';
+
+            link.appendChild(img);
+            return link;
+        };
+
+        // render set 1 + set 2 for seamless vertical loop
+        [...data.badges, ...data.badges].forEach((badge) => {
+            grid.appendChild(makeBadgeEl(badge));
+        });
+    } catch (error) {
+        countEl.textContent = 'Certifications and badges';
+        fallbackEl.hidden = false;
+        fallbackEl.textContent = 'Could not load badges right now.';
+        grid.innerHTML = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadCredlyBadges);
+
+// Footer button and circular favicon
+document.addEventListener('DOMContentLoaded', () => {
+    // Build a circular PNG favicon from the full profile photo at runtime
+    function setCircularFavicon(src) {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const size = 64;
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, size, size);
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.clip();
+
+            // Cover crop of the full image so the whole body is visible
+            const scale = Math.max(size / img.width, size / img.height);
+            const w = img.width * scale;
+            const h = img.height * scale;
+            const x = (size - w) / 2;
+            const y = (size - h) / 2;
+            ctx.drawImage(img, x, y, w, h);
+
+            const url = canvas.toDataURL('image/png');
+            let link = document.querySelector('link[rel="icon"]');
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            link.type = 'image/png';
+            link.href = url;
+            let shortcut = document.querySelector('link[rel="shortcut icon"]');
+            if (shortcut) {
+                shortcut.type = 'image/png';
+                shortcut.href = url;
+            }
+        };
+        img.src = src + (src.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    }
+
+    setCircularFavicon('assets/imaad.jpg');
+
+    // Glass Button Scroll to Top Functionality
+    const glassButton = document.querySelector('.glass-button');
+    if (glassButton) {
+        glassButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+});
+
