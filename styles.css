@@ -337,9 +337,21 @@ a:focus-visible {
 }
 
 .job__meta {
-    margin-top: 0.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.18rem;
     color: var(--muted);
     font-size: 0.9em;
+}
+
+.job__logo {
+    display: block;
+    width: auto;
+    height: 0.95rem;
+    object-fit: contain;
+    filter: grayscale(1) contrast(1.15);
+    opacity: 0.88;
 }
 
 .proof__row {
