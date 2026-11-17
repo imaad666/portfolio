@@ -522,8 +522,7 @@ a:focus-visible {
     scroll-padding-inline: calc(50% - (var(--badge-size) / 2));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(20, 24, 22, 0.28) transparent;
+    scrollbar-width: none;
     outline: none;
     background: transparent;
     cursor: grab;
@@ -531,12 +530,7 @@ a:focus-visible {
 }
 
 .badge-deck__track::-webkit-scrollbar {
-    height: 4px;
-}
-
-.badge-deck__track::-webkit-scrollbar-thumb {
-    background: rgba(20, 24, 22, 0.28);
-    border-radius: 999px;
+    display: none;
 }
 
 .badge-deck__track:active {
