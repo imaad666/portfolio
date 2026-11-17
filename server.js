@@ -14,6 +14,7 @@ if (fs.existsSync(envPath)) {
 
 const githubContributions = require("./api/github-contributions");
 const credlyBadges = require("./api/credly-badges");
+const accredibleBadges = require("./api/accredible-badges");
 
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
@@ -36,6 +37,7 @@ const MIME_TYPES = {
 const API_ROUTES = {
   "/api/github-contributions": githubContributions,
   "/api/credly-badges": credlyBadges,
+  "/api/accredible-badges": accredibleBadges,
 };
 
 function createResponseAdapter(res) {
@@ -96,7 +98,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`Portfolio running at http://localhost:${PORT}`);
-  console.log("APIs: /api/credly-badges, /api/github-contributions");
+  console.log("APIs: /api/credly-badges, /api/accredible-badges, /api/github-contributions");
   if (!process.env.GITHUB_TOKEN) {
     console.log("Note: set GITHUB_TOKEN in .env for the contributions heatmap");
   }
