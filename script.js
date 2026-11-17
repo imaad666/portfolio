@@ -1,8 +1,5 @@
 (function () {
   const LOGIN = "imaad666";
-  // Compact graph — ~6 months reads cleaner next to the badge coverflow
-  const HEATMAP_WEEKS = 26;
-  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const LEVELS = [
     null,
     "heatmap-day--l1",
@@ -72,70 +69,16 @@
     };
   }
 
-  function trimWeeks(weeks) {
-    if (!Array.isArray(weeks) || weeks.length <= HEATMAP_WEEKS) return weeks || [];
-    return weeks.slice(weeks.length - HEATMAP_WEEKS);
-  }
-
-  function sumContributions(weeks) {
-    return weeks.reduce((total, week) => {
-      const days = week.contributionDays || [];
-      return (
-        total +
-        days.reduce((sum, day) => sum + (day.contributionCount || day.count || 0), 0)
-      );
-    }, 0);
-  }
-
-  function renderMonthLabels(orderedWeeks) {
-    const monthsEl = document.getElementById("heatmap-months");
-    if (!monthsEl) return;
-
-    const gap = 2;
-    const daySize = (() => {
-      const probe = document.querySelector(".heatmap-day");
-      return probe ? probe.getBoundingClientRect().width || 8 : 8;
-    })();
-    const weekWidth = daySize + gap;
-
-    monthsEl.innerHTML = "";
-    monthsEl.style.position = "relative";
-    monthsEl.style.width = `${Math.max(orderedWeeks.length * weekWidth - gap, 0)}px`;
-
-    let lastMonth = -1;
-    orderedWeeks.forEach((week, weekIndex) => {
-      const day = (week.contributionDays || []).find((d) => d.date);
-      if (!day || !day.date) return;
-
-      const date = new Date(day.date + "T00:00:00");
-      const month = date.getMonth();
-      if (month === lastMonth) return;
-      lastMonth = month;
-
-      const label = document.createElement("span");
-      label.className = "heatmap-month";
-      label.textContent = MONTHS[month];
-      label.style.position = "absolute";
-      label.style.left = `${weekIndex * weekWidth}px`;
-      monthsEl.appendChild(label);
-    });
-  }
-
   function renderHeatmap({ total, weeks }) {
     const heatmap = document.getElementById("contributions-heatmap");
     const totalEl = document.getElementById("contributions-total");
     const fallbackEl = document.getElementById("contributions-fallback");
 
-    // Show recent half-year so ~6 month labels fit cleanly in the bento cell
-    const orderedWeeks = trimWeeks(weeks);
-    const recentTotal = sumContributions(orderedWeeks);
-    totalEl.textContent = `${Number(recentTotal || total).toLocaleString()} · 6 mo`;
+    totalEl.textContent = `${Number(total).toLocaleString()} · year`;
     fallbackEl.hidden = true;
     heatmap.innerHTML = "";
 
-    renderMonthLabels(orderedWeeks);
-
-    orderedWeeks.forEach((week, weekIndex) => {
+    (weeks || []).forEach((week, weekIndex) => {
       const weekCol = document.createElement("div");
       weekCol.className = "heatmap-week";
       const delay = `${weekIndex * 0.018}s`;

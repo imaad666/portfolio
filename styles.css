@@ -397,36 +397,11 @@ a:focus-visible {
     display: none;
 }
 
-.heatmap-scroll {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: max-content;
-}
-
-.heatmap-months {
-    display: flex;
-    height: 0.8rem;
-    font-size: 0.6rem;
-    line-height: 1;
-    color: var(--muted);
-    letter-spacing: 0.02em;
-}
-
-.heatmap-month {
-    flex: 0 0 auto;
-    white-space: nowrap;
-}
-
-.heatmap-body {
-    position: relative;
-    min-height: 54px;
-}
-
 .heatmap {
     display: flex;
     gap: 2px;
-    position: relative;
+    width: max-content;
+    min-height: 54px;
 }
 
 .heatmap .heatmap-day {
@@ -764,13 +739,8 @@ a:focus-visible {
         height: 7px;
     }
 
-    .heatmap-body {
+    .heatmap {
         min-height: 52px;
-    }
-
-    .heatmap-months {
-        height: 0.7rem;
-        font-size: 0.52rem;
     }
 
     .project-stack {
@@ -844,7 +814,7 @@ a:focus-visible {
         height: 7.5px;
     }
 
-    .heatmap-body {
+    .heatmap {
         min-height: 50px;
     }
 
