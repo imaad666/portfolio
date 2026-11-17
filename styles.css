@@ -742,48 +742,174 @@ a:focus-visible {
     outline: none;
 }
 
-/* —— Phone / compact —— */
+/* —— Phone: natural stacked flow (not a crushed desktop) —— */
 @media (max-width: 720px) {
     :root {
-        --sheet-pad: 0.55rem;
-        --row-gap: 0.7rem;
-        --col-gap: 0.7rem;
+        --sheet-pad: 1rem;
+        --row-gap: 1.15rem;
+        --col-gap: 0.85rem;
         --cell-pad: 0;
-        --badge-size: 2.85rem;
-        --coverflow-h: 4.75rem;
+        --badge-size: 3.1rem;
+        --coverflow-h: 5.1rem;
+    }
+
+    html,
+    body {
+        height: auto;
+        min-height: 100dvh;
+        max-height: none;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     body {
-        font-size: 0.74rem;
+        font-size: 0.82rem;
+    }
+
+    .sheet {
+        height: auto;
+        min-height: 100dvh;
+        align-items: flex-start;
+        padding-block: 1.15rem 1.5rem;
     }
 
     .stack {
-        height: 100%;
-        max-height: 100%;
-        justify-content: space-between;
+        height: auto;
+        max-height: none;
+        justify-content: flex-start;
+        gap: var(--row-gap);
     }
 
     .row--top,
     .row--mid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
+        gap: 0.85rem;
+    }
+
+    .tile--identity {
+        gap: 0.75rem;
     }
 
     .identity__photo {
-        width: 2.85rem;
-        height: 2.85rem;
+        width: 3.4rem;
+        height: 3.4rem;
     }
 
     .identity__name {
-        font-size: 1.05rem;
+        font-size: 1.35rem;
     }
 
     .identity__links {
-        margin-top: 0.25rem;
-        font-size: 0.8em;
+        margin-top: 0.35rem;
+        gap: 0.45rem 0.7rem;
+        font-size: 0.86em;
+    }
+
+    .tile--work {
+        padding-top: 0.1rem;
     }
 
     .job__title {
-        font-size: 1em;
+        font-size: 1.05em;
+    }
+
+    .job__meta {
+        font-size: 0.9em;
+    }
+
+    .heatmap-day {
+        width: 8px;
+        height: 8px;
+    }
+
+    .heatmap {
+        min-height: 58px;
+    }
+
+    .heatmap-wrap {
+        /* Soft edge so the year graph doesn’t feel clipped raw */
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+        mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+    }
+
+    .badge-deck__track {
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0,
+            #000 16%,
+            #000 84%,
+            transparent 100%
+        );
+        mask-image: linear-gradient(
+            to right,
+            transparent 0,
+            #000 16%,
+            #000 84%,
+            transparent 100%
+        );
+    }
+
+    .project-deck {
+        min-height: 4rem;
+    }
+
+    .project-deck__track {
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0,
+            #000 8%,
+            #000 92%,
+            transparent 100%
+        );
+        mask-image: linear-gradient(
+            to right,
+            transparent 0,
+            #000 8%,
+            #000 92%,
+            transparent 100%
+        );
+    }
+
+    .project-deck__item {
+        /* One clear card; neighbors barely peek */
+        width: min(20rem, 88vw);
+    }
+
+    .project-deck__strip {
+        gap: 1.4rem;
+    }
+
+    .proof__blurb {
+        font-size: 0.9em;
+        -webkit-line-clamp: 2;
+    }
+
+    .photo-slot {
+        min-height: 2.4rem;
+        gap: 1rem;
+        justify-content: flex-start;
+    }
+
+    .photo-mark__glyph {
+        width: 1.85rem;
+        height: 1.85rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 420px) {
+    :root {
+        --sheet-pad: 0.85rem;
+        --badge-size: 2.9rem;
+        --coverflow-h: 4.8rem;
+    }
+
+    .identity__name {
+        font-size: 1.2rem;
+    }
+
+    .identity__links {
+        gap: 0.4rem 0.55rem;
     }
 
     .heatmap-day {
@@ -791,59 +917,13 @@ a:focus-visible {
         height: 7px;
     }
 
-    .heatmap {
-        min-height: 52px;
-    }
-
-    .project-deck {
-        min-height: 3.35rem;
-    }
-
     .project-deck__item {
-        width: min(14.5rem, 78vw);
-    }
-
-    .proof__blurb {
-        font-size: 0.85em;
-    }
-
-    .photo-slot {
-        min-height: 2.15rem;
-        gap: 0.65rem;
-    }
-
-    .photo-mark__glyph {
-        width: 1.75rem;
-        height: 1.75rem;
-        font-size: 0.8rem;
+        width: 86vw;
     }
 }
 
-@media (max-width: 420px) {
-    .row--top {
-        grid-template-columns: 1.2fr 0.8fr;
-    }
-
-    .row--mid {
-        grid-template-columns: 1fr;
-        gap: 0.4rem;
-    }
-
-    .tile--identity {
-        gap: 0.55rem;
-    }
-
-    .job__meta {
-        font-size: 0.82em;
-    }
-
-    .heatmap-day {
-        width: 6.5px;
-        height: 6.5px;
-    }
-}
-
-@media (max-height: 700px) {
+/* Short desktop / laptop heights only — keep phone scrollable */
+@media (max-height: 700px) and (min-width: 721px) {
     :root {
         --row-gap: 0.55rem;
         --badge-size: 2.6rem;
@@ -876,19 +956,5 @@ a:focus-visible {
     .photo-mark__glyph {
         width: 1.65rem;
         height: 1.65rem;
-    }
-}
-
-@media (max-height: 640px) and (max-width: 720px) {
-    .proof__blurb {
-        -webkit-line-clamp: 1;
-    }
-
-    .tile__head--tight {
-        margin-bottom: 0.2rem;
-    }
-
-    .photo-mark__name {
-        font-size: 0.88em;
     }
 }

@@ -98,6 +98,15 @@
     };
   }
 
+  function weeksForViewport(weeks) {
+    if (!Array.isArray(weeks) || !weeks.length) return weeks || [];
+    // Phones can’t usefully show a full year — keep recent months
+    const narrow = window.matchMedia("(max-width: 720px)").matches;
+    if (!narrow) return weeks;
+    const keep = window.matchMedia("(max-width: 420px)").matches ? 18 : 22;
+    return weeks.length > keep ? weeks.slice(weeks.length - keep) : weeks;
+  }
+
   function renderHeatmap({ total, weeks }) {
     const heatmap = document.getElementById("contributions-heatmap");
     const totalEl = document.getElementById("contributions-total");
@@ -107,7 +116,7 @@
     fallbackEl.hidden = true;
     heatmap.innerHTML = "";
 
-    (weeks || []).forEach((week, weekIndex) => {
+    weeksForViewport(weeks).forEach((week, weekIndex) => {
       const weekCol = document.createElement("div");
       weekCol.className = "heatmap-week";
       const delay = `${weekIndex * 0.018}s`;
