@@ -5,7 +5,7 @@
   const carouselHub = {
     controllers: [],
     timerId: null,
-    period: 4500,
+    period: 5200,
     register(controller) {
       this.controllers.push(controller);
     },
@@ -236,8 +236,16 @@
     let dragging = false;
     let didDrag = false;
     let syncing = false;
-    let rafId = 0;
     let scrollAnimId = 0;
+    let loopId = 0;
+
+    const visuals = items.map(() => ({
+      scale: 0.78,
+      lift: 0,
+      rotate: 0,
+      gray: 1,
+      opacity: 0.42,
+    }));
 
     function markActive(index) {
       active = index;
@@ -249,15 +257,13 @@
       });
     }
 
-    function paint() {
-      rafId = 0;
-      if (!track || !items.length) return;
-
+    function sampleTargets() {
+      if (!track) return [];
       const mid = track.scrollLeft + track.clientWidth / 2;
       let best = 0;
       let bestDist = Infinity;
 
-      items.forEach((item, i) => {
+      const targets = items.map((item, i) => {
         const width = item.offsetWidth || 1;
         const center = item.offsetLeft + width / 2;
         const px = center - mid;
@@ -267,27 +273,69 @@
           best = i;
         }
 
-        const t = px / (width * 1.05);
-        const abs = Math.min(Math.abs(t), 2.2);
-        const ease = Math.min(abs / 1.15, 1);
-        const scale = 1.08 - ease * 0.18;
-        const lift = (1 - ease) * 0.06;
-        const rotate = Math.max(-2.5, Math.min(2.5, t * -1.6));
-        const gray = Math.min(1, ease * 1.1);
-        const opacity = 1 - ease * 0.32;
-
-        item.style.transform = `translate3d(0, ${-lift}rem, 0) scale(${scale}) rotate(${rotate}deg)`;
-        item.style.filter = `grayscale(${gray}) contrast(${1.03 + (1 - gray) * 0.04})`;
-        item.style.opacity = String(Math.max(0.52, opacity));
-        item.style.zIndex = String(Math.round(40 - abs * 10));
+        const t = px / (width * 0.95);
+        const abs = Math.min(Math.abs(t), 2.4);
+        // Soft falloff so the focused badge clearly blooms
+        const ease = 1 - Math.pow(1 - Math.min(abs / 1.25, 1), 1.65);
+        return {
+          scale: 1.22 - ease * 0.44,
+          lift: (1 - ease) * 0.2,
+          rotate: Math.max(-7, Math.min(7, t * -3.8)),
+          gray: Math.min(1, ease * 1.15),
+          opacity: Math.max(0.34, 1 - ease * 0.55),
+          z: Math.round(50 - abs * 12),
+        };
       });
 
       if (best !== active) markActive(best);
+      return targets;
     }
 
-    function requestPaint() {
-      if (rafId) return;
-      rafId = requestAnimationFrame(paint);
+    function applyVisual(item, visual, z) {
+      item.style.transform = `translate3d(0, ${-visual.lift}rem, 0) scale(${visual.scale}) rotate(${visual.rotate}deg)`;
+      item.style.filter = `grayscale(${visual.gray}) contrast(${1.02 + (1 - visual.gray) * 0.08})`;
+      item.style.opacity = String(visual.opacity);
+      item.style.zIndex = String(z);
+    }
+
+    function tick() {
+      loopId = 0;
+      if (!track || !items.length) return;
+
+      const targets = sampleTargets();
+      // Faster while dragging so it tracks the hand; slower otherwise = grace
+      const k = dragging ? 0.42 : syncing ? 0.16 : 0.11;
+      let stillMoving = dragging || syncing;
+
+      items.forEach((item, i) => {
+        const visual = visuals[i];
+        const target = targets[i];
+        if (!target) return;
+
+        visual.scale += (target.scale - visual.scale) * k;
+        visual.lift += (target.lift - visual.lift) * k;
+        visual.rotate += (target.rotate - visual.rotate) * k;
+        visual.gray += (target.gray - visual.gray) * k;
+        visual.opacity += (target.opacity - visual.opacity) * k;
+
+        if (
+          Math.abs(target.scale - visual.scale) > 0.0015 ||
+          Math.abs(target.gray - visual.gray) > 0.004 ||
+          Math.abs(target.opacity - visual.opacity) > 0.004
+        ) {
+          stillMoving = true;
+        }
+
+        applyVisual(item, visual, target.z);
+      });
+
+      if (stillMoving) {
+        loopId = requestAnimationFrame(tick);
+      }
+    }
+
+    function kick() {
+      if (!loopId) loopId = requestAnimationFrame(tick);
     }
 
     function targetScrollLeft(index) {
@@ -296,7 +344,7 @@
       return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
     }
 
-    function animateTo(index, duration = 1100) {
+    function animateTo(index, duration = 1400) {
       if (!track || !items[index]) return;
       if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
 
@@ -308,26 +356,27 @@
         track.scrollLeft = end;
         syncing = false;
         markActive(index);
-        requestPaint();
+        kick();
         return;
       }
 
       syncing = true;
       const t0 = performance.now();
+      kick();
 
       const step = (now) => {
         const p = Math.min(1, (now - t0) / duration);
-        // smooth ease-in-out
-        const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        // Ease-out quint — long glide into place
+        const e = 1 - Math.pow(1 - p, 5);
         track.scrollLeft = start + delta * e;
-        requestPaint();
+        kick();
         if (p < 1) {
           scrollAnimId = requestAnimationFrame(step);
         } else {
           scrollAnimId = 0;
           syncing = false;
           markActive(index);
-          requestPaint();
+          kick();
         }
       };
 
@@ -343,7 +392,7 @@
         }
         if (index !== active) {
           event.preventDefault();
-          animateTo(index, 1200);
+          animateTo(index, 1500);
           carouselHub.restart();
         }
       });
@@ -353,7 +402,7 @@
       track.addEventListener(
         "scroll",
         () => {
-          if (!syncing) requestPaint();
+          kick();
         },
         { passive: true }
       );
@@ -363,9 +412,9 @@
         (event) => {
           if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
             event.preventDefault();
-            track.scrollLeft += event.deltaY * 0.7;
+            track.scrollLeft += event.deltaY * 0.55;
           }
-          requestPaint();
+          kick();
           carouselHub.restart();
         },
         { passive: false }
@@ -384,6 +433,7 @@
         dragScrollLeft = track.scrollLeft;
         track.setPointerCapture(event.pointerId);
         if (carouselHub.timerId) clearInterval(carouselHub.timerId);
+        kick();
       });
 
       track.addEventListener("pointermove", (event) => {
@@ -391,14 +441,13 @@
         const dx = event.clientX - dragStartX;
         if (Math.abs(dx) > 5) didDrag = true;
         track.scrollLeft = dragScrollLeft - dx;
-        requestPaint();
+        kick();
       });
 
       const endDrag = () => {
         if (!dragging) return;
         dragging = false;
-        paint();
-        animateTo(active, 900);
+        animateTo(active, 1100);
         carouselHub.restart();
       };
 
@@ -423,17 +472,17 @@
       const pad = Math.max(12, track.clientWidth / 2 - items[0].offsetWidth / 2);
       stack.style.paddingLeft = `${pad}px`;
       stack.style.paddingRight = `${pad}px`;
-      requestPaint();
+      kick();
     }
 
     padForCenter();
     window.addEventListener("resize", padForCenter);
-    requestPaint();
     animateTo(0, 0);
+    kick();
 
     carouselHub.register({
-      next: () => animateTo((active + 1) % items.length, 1100),
-      prev: () => animateTo((active - 1 + items.length) % items.length, 1100),
+      next: () => animateTo((active + 1) % items.length, 1500),
+      prev: () => animateTo((active - 1 + items.length) % items.length, 1500),
     });
     carouselHub.restart();
   }
