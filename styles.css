@@ -1,19 +1,20 @@
 /* Desk portfolio — rows, textured stage, single viewport */
 
 :root {
-    --paper: #e4e6e1;
-    --paper-deep: #d0d4cd;
-    --ink: #141816;
-    --ink-soft: #2f3531;
-    --muted: #5c6560;
-    --link: #141816;
+    /* Neutral stone paper — sage greens were reading too green on Windows Chrome */
+    --paper: #e8e7e4;
+    --paper-deep: #d6d4d0;
+    --ink: #161616;
+    --ink-soft: #333230;
+    --muted: #65625c;
+    --link: #161616;
     --accent: #0f6e6a;
     /* Gray intensity ladder */
-    --heat-0: rgba(20, 24, 22, 0.07);
-    --heat-1: rgba(20, 24, 22, 0.16);
-    --heat-2: rgba(20, 24, 22, 0.28);
-    --heat-3: rgba(20, 24, 22, 0.44);
-    --heat-4: rgba(20, 24, 22, 0.64);
+    --heat-0: rgba(22, 22, 20, 0.07);
+    --heat-1: rgba(22, 22, 20, 0.16);
+    --heat-2: rgba(22, 22, 20, 0.28);
+    --heat-3: rgba(22, 22, 20, 0.44);
+    --heat-4: rgba(22, 22, 20, 0.64);
     --sheet-pad: clamp(0.65rem, 1.8vw, 1.25rem);
     --stack-max: 58rem;
     --row-gap: clamp(0.85rem, 2.2vh, 1.4rem);
@@ -57,25 +58,25 @@ body {
     z-index: 0;
     pointer-events: none;
     background:
-        radial-gradient(110% 80% at 12% -10%, rgba(255, 255, 250, 0.78), transparent 52%),
-        radial-gradient(90% 70% at 95% 105%, rgba(15, 110, 106, 0.11), transparent 48%),
-        linear-gradient(155deg, #eff1ec 0%, var(--paper) 46%, #c8cdc4 100%);
+        radial-gradient(110% 80% at 12% -10%, rgba(255, 255, 252, 0.82), transparent 52%),
+        radial-gradient(90% 70% at 95% 105%, rgba(40, 36, 30, 0.06), transparent 48%),
+        linear-gradient(155deg, #f1f0ed 0%, var(--paper) 46%, #cbc8c3 100%);
 }
 
 .stage__wash {
     position: absolute;
     inset: -12%;
     background:
-        radial-gradient(ellipse 42% 36% at 72% 16%, rgba(15, 110, 106, 0.09), transparent 62%),
-        radial-gradient(ellipse 38% 32% at 18% 78%, rgba(40, 48, 36, 0.06), transparent 58%);
+        radial-gradient(ellipse 42% 36% at 72% 16%, rgba(50, 46, 40, 0.05), transparent 62%),
+        radial-gradient(ellipse 38% 32% at 18% 78%, rgba(30, 28, 26, 0.05), transparent 58%);
     animation: wash-drift 18s ease-in-out infinite;
 }
 
 .stage__mesh {
     position: absolute;
     inset: 0;
-    opacity: 0.4;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.08 0 0 0 0 0.1 0 0 0 0 0.09 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.36;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.09 0 0 0 0 0.09 0 0 0 0 0.088 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 200px 200px;
     mix-blend-mode: multiply;
     mask-image: radial-gradient(ellipse 78% 68% at 50% 42%, #000 20%, transparent 85%);
@@ -95,7 +96,7 @@ body {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(26, 30, 24, 0.18) 100%);
+        radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(28, 27, 24, 0.16) 100%);
 }
 
 .stage__marks {
