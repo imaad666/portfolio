@@ -730,12 +730,15 @@ a:focus-visible {
 .photo-slot {
     display: flex;
     align-items: center;
-    gap: clamp(0.75rem, 3vw, 1.5rem);
+    justify-content: center;
+    gap: clamp(1.25rem, 5vw, 2.75rem);
+    width: 100%;
     min-height: 2.6rem;
 }
 
 .photo-mark {
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
     gap: 0.4rem;
     text-decoration: none;
