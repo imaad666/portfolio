@@ -215,8 +215,10 @@
     let dragging = false;
     let didDrag = false;
     let syncing = false;
+    let rafId = 0;
+    let scrollAnimId = 0;
 
-    function setActive(index, { scroll = false } = {}) {
+    function markActive(index) {
       active = index;
       items.forEach((item, i) => {
         const on = i === index;
@@ -224,46 +226,105 @@
         item.setAttribute("aria-selected", String(on));
         item.tabIndex = on ? 0 : -1;
       });
-      if (scroll && track) {
-        syncing = true;
-        const item = items[index];
-        const target =
-          item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2);
-        track.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
-        setTimeout(() => {
-          syncing = false;
-        }, 380);
-      }
     }
 
-    function nearestIndex() {
-      if (!track || !items.length) return 0;
+    function paint() {
+      rafId = 0;
+      if (!track || !items.length) return;
+
       const mid = track.scrollLeft + track.clientWidth / 2;
       let best = 0;
       let bestDist = Infinity;
+
       items.forEach((item, i) => {
-        const center = item.offsetLeft + item.offsetWidth / 2;
-        const dist = Math.abs(center - mid);
-        if (dist < bestDist) {
-          bestDist = dist;
+        const width = item.offsetWidth || 1;
+        const center = item.offsetLeft + width / 2;
+        const px = center - mid;
+        const absPx = Math.abs(px);
+        if (absPx < bestDist) {
+          bestDist = absPx;
           best = i;
         }
+
+        const t = px / (width * 0.9);
+        const abs = Math.min(Math.abs(t), 2.5);
+        const ease = 1 - Math.pow(1 - Math.min(abs / 1.35, 1), 2);
+        const scale = 1.18 - ease * 0.34;
+        const lift = (1 - ease) * 0.2;
+        const rotate = Math.max(-9, Math.min(9, t * -4.8));
+        const gray = Math.min(1, ease * 1.05);
+        const opacity = 1 - ease * 0.42;
+
+        item.style.transform = `translate3d(0, ${-lift}rem, 0) scale(${scale}) rotate(${rotate}deg)`;
+        item.style.filter = `grayscale(${gray}) contrast(${1.04 + (1 - gray) * 0.05})`;
+        item.style.opacity = String(Math.max(0.46, opacity));
+        item.style.zIndex = String(Math.round(40 - abs * 10));
       });
-      return best;
+
+      if (best !== active) markActive(best);
+    }
+
+    function requestPaint() {
+      if (rafId) return;
+      rafId = requestAnimationFrame(paint);
+    }
+
+    function targetScrollLeft(index) {
+      const item = items[index];
+      if (!track || !item) return 0;
+      return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
+    }
+
+    function animateTo(index, duration = 780) {
+      if (!track || !items[index]) return;
+      if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
+
+      const start = track.scrollLeft;
+      const end = targetScrollLeft(index);
+      const delta = end - start;
+
+      if (duration <= 0 || Math.abs(delta) < 0.5) {
+        track.scrollLeft = end;
+        syncing = false;
+        markActive(index);
+        requestPaint();
+        return;
+      }
+
+      syncing = true;
+      const t0 = performance.now();
+
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / duration);
+        // smooth ease-in-out
+        const e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        track.scrollLeft = start + delta * e;
+        requestPaint();
+        if (p < 1) {
+          scrollAnimId = requestAnimationFrame(step);
+        } else {
+          scrollAnimId = 0;
+          syncing = false;
+          markActive(index);
+          requestPaint();
+        }
+      };
+
+      scrollAnimId = requestAnimationFrame(step);
     }
 
     function next() {
-      setActive((active + 1) % items.length, { scroll: true });
+      animateTo((active + 1) % items.length);
     }
 
     function prev() {
-      setActive((active - 1 + items.length) % items.length, { scroll: true });
+      animateTo((active - 1 + items.length) % items.length);
     }
 
     function startAuto() {
       if (timerId) clearInterval(timerId);
       if (items.length < 2) return;
-      timerId = setInterval(next, 3800);
+      timerId = setInterval(next, 4200);
     }
 
     items.forEach((item, index) => {
@@ -275,7 +336,7 @@
         }
         if (index !== active) {
           event.preventDefault();
-          setActive(index, { scroll: true });
+          animateTo(index, 860);
           startAuto();
         }
       });
@@ -285,21 +346,19 @@
       track.addEventListener(
         "scroll",
         () => {
-          if (syncing) return;
-          const idx = nearestIndex();
-          if (idx !== active) setActive(idx);
+          if (!syncing) requestPaint();
         },
         { passive: true }
       );
 
-      // Map vertical wheel to horizontal scroll so trackpads always work
       track.addEventListener(
         "wheel",
         (event) => {
           if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
             event.preventDefault();
-            track.scrollLeft += event.deltaY;
+            track.scrollLeft += event.deltaY * 0.85;
           }
+          requestPaint();
           if (timerId) clearInterval(timerId);
           startAuto();
         },
@@ -308,6 +367,11 @@
 
       track.addEventListener("pointerdown", (event) => {
         if (event.pointerType === "mouse" && event.button !== 0) return;
+        if (scrollAnimId) {
+          cancelAnimationFrame(scrollAnimId);
+          scrollAnimId = 0;
+          syncing = false;
+        }
         dragging = true;
         didDrag = false;
         dragStartX = event.clientX;
@@ -319,14 +383,16 @@
       track.addEventListener("pointermove", (event) => {
         if (!dragging) return;
         const dx = event.clientX - dragStartX;
-        if (Math.abs(dx) > 6) didDrag = true;
+        if (Math.abs(dx) > 5) didDrag = true;
         track.scrollLeft = dragScrollLeft - dx;
+        requestPaint();
       });
 
       const endDrag = () => {
         if (!dragging) return;
         dragging = false;
-        setActive(nearestIndex(), { scroll: true });
+        paint();
+        animateTo(active, 720);
         startAuto();
       };
 
@@ -351,11 +417,13 @@
       const pad = Math.max(12, track.clientWidth / 2 - items[0].offsetWidth / 2);
       stack.style.paddingLeft = `${pad}px`;
       stack.style.paddingRight = `${pad}px`;
+      requestPaint();
     }
 
     padForCenter();
     window.addEventListener("resize", padForCenter);
-    setActive(0, { scroll: true });
+    requestPaint();
+    animateTo(0, 0);
     startAuto();
   }
 

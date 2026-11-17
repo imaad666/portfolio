@@ -456,10 +456,11 @@ a:focus-visible {
     min-height: var(--coverflow-h);
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: x proximity;
     scroll-padding-inline: calc(50% - (var(--badge-size) / 2));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
+    scroll-behavior: auto;
     scrollbar-width: none;
     outline: none;
     background: transparent;
@@ -499,25 +500,17 @@ a:focus-visible {
     margin-left: calc(var(--badge-size) * -0.38);
     scroll-snap-align: center;
     text-decoration: none;
-    transform: scale(0.86) rotate(-4deg);
+    transform: translate3d(0, 0, 0) scale(0.84);
     transform-origin: center bottom;
-    filter: grayscale(1) contrast(1.08);
-    opacity: 0.62;
+    filter: grayscale(1) contrast(1.06);
+    opacity: 0.55;
     z-index: 1;
-    transition:
-        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-        filter 0.35s ease,
-        opacity 0.35s ease,
-        z-index 0s;
+    will-change: transform, filter, opacity;
     background: transparent;
 }
 
 .badge-deck__item:first-child {
     margin-left: 0;
-}
-
-.badge-deck__item:nth-child(even) {
-    transform: scale(0.86) rotate(3deg);
 }
 
 .badge-deck__item img {
@@ -529,17 +522,8 @@ a:focus-visible {
     border-radius: 0.2rem;
 }
 
-.badge-deck__item.is-active {
-    transform: scale(1.14) rotate(0deg) translateY(-0.15rem);
-    filter: grayscale(0) contrast(1.05);
-    opacity: 1;
-    z-index: 8;
-}
-
 .badge-deck__item:focus-visible {
     outline: none;
-    filter: grayscale(0) contrast(1.05);
-    opacity: 1;
 }
 
 .badge-fallback {
