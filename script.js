@@ -6,25 +6,38 @@
     let timerId = null;
     let nextFn = null;
     let prevFn = null;
+    let blocked = false;
     return {
       bind({ next, prev }) {
         nextFn = next;
         prevFn = prev;
       },
       next() {
+        if (blocked) return;
         nextFn?.();
       },
       prev() {
+        if (blocked) return;
         prevFn?.();
       },
       pause() {
         if (timerId) clearInterval(timerId);
         timerId = null;
       },
+      block() {
+        blocked = true;
+        this.pause();
+      },
+      unblock() {
+        blocked = false;
+      },
       restart() {
         this.pause();
+        blocked = false;
         if (!nextFn) return;
-        timerId = setInterval(() => nextFn(), period);
+        timerId = setInterval(() => {
+          if (!blocked) nextFn();
+        }, period);
       },
     };
   }
@@ -255,10 +268,13 @@
     let dragging = false;
     let didDrag = false;
     let syncing = false;
+    let programmatic = false;
     let scrollAnimId = 0;
     let loopId = 0;
-    const auto = createAutoAdvance(4600);
-    // Touch / narrow screens: native snap scroll — custom drag fights iOS momentum
+    let resumeTimer = null;
+    let progTimer = null;
+    const auto = createAutoAdvance(5200);
+    // Touch: native swipe momentum; desktop: custom drag. Both keep curved lerp.
     const touchy =
       window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
 
@@ -270,6 +286,25 @@
       opacity: 0.42,
     }));
 
+    function cancelProgrammaticScroll() {
+      if (scrollAnimId) {
+        cancelAnimationFrame(scrollAnimId);
+        scrollAnimId = 0;
+      }
+      syncing = false;
+    }
+
+    // Manual input wins — stop timed advances until the user goes idle
+    function noteManual() {
+      auto.block();
+      cancelProgrammaticScroll();
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        auto.unblock();
+        auto.restart();
+      }, 2400);
+    }
+
     function markActive(index) {
       active = index;
       items.forEach((item, i) => {
@@ -277,13 +312,6 @@
         item.classList.toggle("is-active", on);
         item.setAttribute("aria-selected", String(on));
         item.tabIndex = on ? 0 : -1;
-        if (touchy) {
-          // Let CSS handle focus look on mobile — clear inline transforms
-          item.style.transform = "";
-          item.style.filter = "";
-          item.style.opacity = "";
-          item.style.zIndex = "";
-        }
       });
     }
 
@@ -357,10 +385,10 @@
 
     function tick() {
       loopId = 0;
-      if (!track || !items.length || touchy) return;
+      if (!track || !items.length) return;
 
       const targets = sampleTargets();
-      const k = dragging ? 0.5 : syncing ? 0.22 : 0.16;
+      const k = dragging ? 0.55 : syncing ? 0.2 : 0.14;
       let stillMoving = dragging || syncing;
 
       items.forEach((item, i) => {
@@ -377,7 +405,8 @@
         if (
           Math.abs(target.scale - visual.scale) > 0.0015 ||
           Math.abs(target.gray - visual.gray) > 0.004 ||
-          Math.abs(target.opacity - visual.opacity) > 0.004
+          Math.abs(target.opacity - visual.opacity) > 0.004 ||
+          Math.abs(target.rotate - visual.rotate) > 0.05
         ) {
           stillMoving = true;
         }
@@ -391,7 +420,6 @@
     }
 
     function kick() {
-      if (touchy) return;
       if (!loopId) loopId = requestAnimationFrame(tick);
     }
 
@@ -403,17 +431,9 @@
 
     function animateTo(index, duration = 980) {
       if (!track || !items[index]) return;
-      if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
+      cancelProgrammaticScroll();
 
       const end = targetScrollLeft(index);
-
-      // Mobile: native smooth scroll + snap, no custom lerp drag
-      if (touchy) {
-        markActive(index);
-        track.scrollTo({ left: end, behavior: duration <= 0 ? "auto" : "smooth" });
-        return;
-      }
-
       const start = track.scrollLeft;
       const delta = end - start;
 
@@ -421,6 +441,19 @@
         track.scrollLeft = end;
         syncing = false;
         markActive(index);
+        kick();
+        return;
+      }
+
+      // On touch, prefer native smooth scroll so momentum isn’t stolen mid-swipe
+      if (touchy) {
+        programmatic = true;
+        markActive(index);
+        track.scrollTo({ left: end, behavior: "smooth" });
+        clearTimeout(progTimer);
+        progTimer = setTimeout(() => {
+          programmatic = false;
+        }, 650);
         kick();
         return;
       }
@@ -456,26 +489,18 @@
         }
         if (index !== active) {
           event.preventDefault();
-          animateTo(index, touchy ? 400 : 1050);
-          auto.restart();
+          noteManual();
+          animateTo(index, touchy ? 500 : 1050);
         }
       });
     });
 
     if (track) {
-      let scrollSettle = null;
       track.addEventListener(
         "scroll",
         () => {
-          if (touchy) {
-            const idx = nearestIndex();
-            if (idx !== active) markActive(idx);
-            clearTimeout(scrollSettle);
-            scrollSettle = setTimeout(() => {
-              auto.restart();
-            }, 180);
-            return;
-          }
+          // User (or momentum) scrolling — never let auto fight it
+          if (!syncing && !programmatic) noteManual();
           kick();
         },
         { passive: true }
@@ -484,32 +509,26 @@
       track.addEventListener(
         "wheel",
         (event) => {
-          if (touchy) return;
           if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
             event.preventDefault();
             track.scrollLeft += event.deltaY * 0.55;
           }
+          noteManual();
           kick();
-          auto.restart();
         },
         { passive: false }
       );
 
-      // Desktop only — pointer drag kills native mobile momentum
       if (!touchy) {
         track.addEventListener("pointerdown", (event) => {
           if (event.pointerType === "mouse" && event.button !== 0) return;
-          if (scrollAnimId) {
-            cancelAnimationFrame(scrollAnimId);
-            scrollAnimId = 0;
-            syncing = false;
-          }
+          cancelProgrammaticScroll();
           dragging = true;
           didDrag = false;
           dragStartX = event.clientX;
           dragScrollLeft = track.scrollLeft;
           track.setPointerCapture(event.pointerId);
-          auto.pause();
+          noteManual();
           kick();
         });
 
@@ -524,8 +543,8 @@
         const endDrag = () => {
           if (!dragging) return;
           dragging = false;
-          animateTo(active, 820);
-          auto.restart();
+          animateTo(nearestIndex(), 820);
+          noteManual();
         };
 
         track.addEventListener("pointerup", endDrag);
@@ -534,7 +553,7 @@
         track.addEventListener(
           "touchstart",
           () => {
-            auto.pause();
+            noteManual();
           },
           { passive: true }
         );
@@ -543,12 +562,12 @@
       track.addEventListener("keydown", (event) => {
         if (event.key === "ArrowRight") {
           event.preventDefault();
-          auto.next();
-          auto.restart();
+          noteManual();
+          animateTo((active + 1) % items.length, 900);
         } else if (event.key === "ArrowLeft") {
           event.preventDefault();
-          auto.prev();
-          auto.restart();
+          noteManual();
+          animateTo((active - 1 + items.length) % items.length, 900);
         }
       });
     }
@@ -559,7 +578,6 @@
       stack.style.paddingLeft = `${pad}px`;
       stack.style.paddingRight = `${pad}px`;
       kick();
-      if (touchy) markActive(nearestIndex());
     }
 
     padForCenter();
@@ -568,9 +586,9 @@
     kick();
 
     auto.bind({
-      next: () => animateTo((active + 1) % items.length, touchy ? 450 : 1050),
+      next: () => animateTo((active + 1) % items.length, touchy ? 600 : 1050),
       prev: () =>
-        animateTo((active - 1 + items.length) % items.length, touchy ? 450 : 1050),
+        animateTo((active - 1 + items.length) % items.length, touchy ? 600 : 1050),
     });
     auto.restart();
   }
@@ -619,6 +637,7 @@
     let syncing = false;
     let scrollAnimId = 0;
     let loopId = 0;
+    let resumeTimer = null;
     const auto = createAutoAdvance(6200);
 
     const visuals = items.map(() => ({
@@ -629,6 +648,20 @@
     items.forEach((item, index) => {
       item.dataset.index = String(index);
     });
+
+    function noteManual() {
+      auto.block();
+      if (scrollAnimId) {
+        cancelAnimationFrame(scrollAnimId);
+        scrollAnimId = 0;
+        syncing = false;
+      }
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        auto.unblock();
+        auto.restart();
+      }, 2400);
+    }
 
     function markActive(index) {
       active = index;
@@ -758,13 +791,20 @@
           return;
         }
         if (index !== active) {
+          noteManual();
           animateTo(index, 1050);
-          auto.restart();
         }
       });
     });
 
-    track.addEventListener("scroll", () => kick(), { passive: true });
+    track.addEventListener(
+      "scroll",
+      () => {
+        if (!syncing) noteManual();
+        kick();
+      },
+      { passive: true }
+    );
 
     track.addEventListener(
       "wheel",
@@ -773,8 +813,8 @@
           event.preventDefault();
           track.scrollLeft += event.deltaY * 0.55;
         }
+        noteManual();
         kick();
-        auto.restart();
       },
       { passive: false }
     );
@@ -792,7 +832,7 @@
       dragStartX = event.clientX;
       dragScrollLeft = track.scrollLeft;
       track.setPointerCapture(event.pointerId);
-      auto.pause();
+      noteManual();
       kick();
     });
 
@@ -808,7 +848,7 @@
       if (!dragging) return;
       dragging = false;
       animateTo(active, 820);
-      auto.restart();
+      noteManual();
     };
 
     track.addEventListener("pointerup", endDrag);
@@ -817,12 +857,12 @@
     track.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        auto.next();
-        auto.restart();
+        noteManual();
+        animateTo((active + 1) % items.length, 900);
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        auto.prev();
-        auto.restart();
+        noteManual();
+        animateTo((active - 1 + items.length) % items.length, 900);
       }
     });
 

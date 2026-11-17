@@ -818,26 +818,10 @@ a:focus-visible {
     }
 
     .badge-deck__item {
-        margin-left: calc(var(--badge-size) * -0.18);
+        /* Keep enough overlap for the curved coverflow line */
+        margin-left: calc(var(--badge-size) * -0.3);
         scroll-snap-align: center;
-        scroll-snap-stop: always;
-        transition:
-            transform 0.35s ease,
-            filter 0.35s ease,
-            opacity 0.35s ease;
-    }
-
-    .badge-deck__item.is-active {
-        filter: grayscale(0) contrast(1.05);
-        opacity: 1;
-        transform: scale(1.08);
-        z-index: 8;
-    }
-
-    .badge-deck__item:not(.is-active) {
-        filter: grayscale(1) contrast(1.05);
-        opacity: 0.55;
-        transform: scale(0.9);
+        scroll-snap-stop: normal;
     }
 
     .project-deck {
