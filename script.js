@@ -137,11 +137,12 @@
 
     const wrap = document.querySelector(".heatmap-wrap");
     if (wrap) {
-      // Show the newest weeks first (right edge of the strip)
+      // Pin to the newest weeks so the latest activity is what’s in view
       requestAnimationFrame(() => {
         wrap.scrollLeft = wrap.scrollWidth;
       });
     }
+
   }
 
   async function loadGitHubContributions() {
@@ -224,6 +225,7 @@
       img.alt = badge.name;
       img.loading = index < 10 ? "eager" : "lazy";
       img.draggable = false;
+      // Same settle-in cadence as the heatmap cells
       img.style.animationDelay = `${index * 0.04}s`;
 
       link.appendChild(img);
@@ -231,48 +233,27 @@
       return link;
     });
 
-    const n = items.length;
-    let progress = 0; // continuous noodle position; ends connect via wrap
     let active = 0;
     let dragStartX = 0;
-    let dragProgress = 0;
+    let dragScrollLeft = 0;
     let dragging = false;
     let didDrag = false;
-    let animating = false;
-    let animId = 0;
+    let syncing = false;
+    let scrollAnimId = 0;
     let loopId = 0;
-    let stepPx = 42;
 
     const visuals = items.map(() => ({
-      x: 0,
       scale: 0.78,
       lift: 0,
       rotate: 0,
       gray: 1,
-      opacity: 0,
+      opacity: 0.42,
     }));
 
-    function measureStep() {
-      const size = items[0]?.offsetWidth || 56;
-      stepPx = size * 0.58;
-    }
-
-    // Shortest signed distance on the loop (connect the noodle ends)
-    function loopDelta(index, from = progress) {
-      let d = index - from;
-      d = ((d % n) + n) % n;
-      if (d > n / 2) d -= n;
-      return d;
-    }
-
-    function normalizeProgress(value) {
-      return ((value % n) + n) % n;
-    }
-
     function markActive(index) {
-      active = ((index % n) + n) % n;
+      active = index;
       items.forEach((item, i) => {
-        const on = i === active;
+        const on = i === index;
         item.classList.toggle("is-active", on);
         item.setAttribute("aria-selected", String(on));
         item.tabIndex = on ? 0 : -1;
@@ -280,26 +261,42 @@
     }
 
     function sampleTargets() {
-      measureStep();
+      if (!track) return [];
+      const mid = track.scrollLeft + track.clientWidth / 2;
       let best = 0;
-      let bestAbs = Infinity;
+      let bestDist = Infinity;
+
+      const edgePad = track.clientWidth * 0.14;
+      const viewLeft = track.scrollLeft + edgePad;
+      const viewRight = track.scrollLeft + track.clientWidth - edgePad;
 
       const targets = items.map((item, i) => {
-        const d = loopDelta(i);
-        const abs = Math.abs(d);
-        if (abs < bestAbs) {
-          bestAbs = abs;
+        const width = item.offsetWidth || 1;
+        const center = item.offsetLeft + width / 2;
+        const px = center - mid;
+        const absPx = Math.abs(px);
+        if (absPx < bestDist) {
+          bestDist = absPx;
           best = i;
         }
 
-        const ease = 1 - Math.pow(1 - Math.min(abs / 1.35, 1), 1.65);
-        const edgeFade = abs > 2.15 ? Math.max(0, 1 - (abs - 2.15) / 0.55) : 1;
+        const t = px / (width * 0.95);
+        const abs = Math.min(Math.abs(t), 2.4);
+        // Soft falloff so the focused badge clearly blooms
+        const ease = 1 - Math.pow(1 - Math.min(abs / 1.25, 1), 1.65);
+
+        // Hide badges that would only show as half-cut edge scraps
+        let edgeFade = 1;
+        if (center < viewLeft) {
+          edgeFade = Math.max(0, 1 - (viewLeft - center) / (width * 0.7));
+        } else if (center > viewRight) {
+          edgeFade = Math.max(0, 1 - (center - viewRight) / (width * 0.7));
+        }
 
         return {
-          x: d * stepPx,
           scale: 1.22 - ease * 0.44,
           lift: (1 - ease) * 0.2,
-          rotate: Math.max(-7, Math.min(7, d * -3.2)),
+          rotate: Math.max(-7, Math.min(7, t * -3.8)),
           gray: Math.min(1, ease * 1.15),
           opacity: Math.max(0, (1 - ease * 0.55) * edgeFade),
           z: Math.round(50 - abs * 12),
@@ -311,25 +308,26 @@
     }
 
     function applyVisual(item, visual, z) {
-      item.style.transform = `translate3d(calc(-50% + ${visual.x}px), ${-visual.lift}rem, 0) scale(${visual.scale}) rotate(${visual.rotate}deg)`;
+      item.style.transform = `translate3d(0, ${-visual.lift}rem, 0) scale(${visual.scale}) rotate(${visual.rotate}deg)`;
       item.style.filter = `grayscale(${visual.gray}) contrast(${1.02 + (1 - visual.gray) * 0.08})`;
       item.style.opacity = String(visual.opacity);
       item.style.zIndex = String(z);
-      item.style.pointerEvents = visual.opacity < 0.12 ? "none" : "auto";
     }
 
     function tick() {
       loopId = 0;
+      if (!track || !items.length) return;
+
       const targets = sampleTargets();
-      const k = dragging ? 0.55 : animating ? 0.24 : 0.18;
-      let stillMoving = dragging || animating;
+      // Faster while dragging so it tracks the hand; slower otherwise = grace
+      const k = dragging ? 0.5 : syncing ? 0.22 : 0.16;
+      let stillMoving = dragging || syncing;
 
       items.forEach((item, i) => {
         const visual = visuals[i];
         const target = targets[i];
         if (!target) return;
 
-        visual.x += (target.x - visual.x) * k;
         visual.scale += (target.scale - visual.scale) * k;
         visual.lift += (target.lift - visual.lift) * k;
         visual.rotate += (target.rotate - visual.rotate) * k;
@@ -337,8 +335,8 @@
         visual.opacity += (target.opacity - visual.opacity) * k;
 
         if (
-          Math.abs(target.x - visual.x) > 0.2 ||
           Math.abs(target.scale - visual.scale) > 0.0015 ||
+          Math.abs(target.gray - visual.gray) > 0.004 ||
           Math.abs(target.opacity - visual.opacity) > 0.004
         ) {
           stillMoving = true;
@@ -347,50 +345,58 @@
         applyVisual(item, visual, target.z);
       });
 
-      if (stillMoving) loopId = requestAnimationFrame(tick);
+      if (stillMoving) {
+        loopId = requestAnimationFrame(tick);
+      }
     }
 
     function kick() {
       if (!loopId) loopId = requestAnimationFrame(tick);
     }
 
+    function targetScrollLeft(index) {
+      const item = items[index];
+      if (!track || !item) return 0;
+      return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
+    }
+
     function animateTo(index, duration = 980) {
-      index = ((index % n) + n) % n;
-      if (!items[index]) return;
-      if (animId) cancelAnimationFrame(animId);
+      if (!track || !items[index]) return;
+      if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
 
-      const start = progress;
-      const delta = loopDelta(index, start);
+      const start = track.scrollLeft;
+      const end = targetScrollLeft(index);
+      const delta = end - start;
 
-      if (duration <= 0 || Math.abs(delta) < 0.001) {
-        progress = normalizeProgress(index);
-        animating = false;
+      if (duration <= 0 || Math.abs(delta) < 0.5) {
+        track.scrollLeft = end;
+        syncing = false;
         markActive(index);
         kick();
         return;
       }
 
-      animating = true;
+      syncing = true;
       const t0 = performance.now();
       kick();
 
       const step = (now) => {
         const p = Math.min(1, (now - t0) / duration);
+        // Ease-out quint — long glide into place
         const e = 1 - Math.pow(1 - p, 5);
-        progress = start + delta * e;
+        track.scrollLeft = start + delta * e;
         kick();
         if (p < 1) {
-          animId = requestAnimationFrame(step);
+          scrollAnimId = requestAnimationFrame(step);
         } else {
-          animId = 0;
-          progress = normalizeProgress(index);
-          animating = false;
+          scrollAnimId = 0;
+          syncing = false;
           markActive(index);
           kick();
         }
       };
 
-      animId = requestAnimationFrame(step);
+      scrollAnimId = requestAnimationFrame(step);
     }
 
     items.forEach((item, index) => {
@@ -410,13 +416,20 @@
 
     if (track) {
       track.addEventListener(
+        "scroll",
+        () => {
+          kick();
+        },
+        { passive: true }
+      );
+
+      track.addEventListener(
         "wheel",
         (event) => {
-          event.preventDefault();
-          const delta = Math.abs(event.deltaY) > Math.abs(event.deltaX)
-            ? event.deltaY
-            : event.deltaX;
-          progress = normalizeProgress(progress + delta * 0.0045);
+          if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+            event.preventDefault();
+            track.scrollLeft += event.deltaY * 0.55;
+          }
           kick();
           carouselHub.restart();
         },
@@ -425,15 +438,15 @@
 
       track.addEventListener("pointerdown", (event) => {
         if (event.pointerType === "mouse" && event.button !== 0) return;
-        if (animId) {
-          cancelAnimationFrame(animId);
-          animId = 0;
-          animating = false;
+        if (scrollAnimId) {
+          cancelAnimationFrame(scrollAnimId);
+          scrollAnimId = 0;
+          syncing = false;
         }
         dragging = true;
         didDrag = false;
         dragStartX = event.clientX;
-        dragProgress = progress;
+        dragScrollLeft = track.scrollLeft;
         track.setPointerCapture(event.pointerId);
         if (carouselHub.timerId) clearInterval(carouselHub.timerId);
         kick();
@@ -443,17 +456,14 @@
         if (!dragging) return;
         const dx = event.clientX - dragStartX;
         if (Math.abs(dx) > 5) didDrag = true;
-        measureStep();
-        progress = dragProgress - dx / stepPx;
+        track.scrollLeft = dragScrollLeft - dx;
         kick();
       });
 
       const endDrag = () => {
         if (!dragging) return;
         dragging = false;
-        progress = normalizeProgress(progress);
-        const nearest = Math.round(progress) % n;
-        animateTo(nearest, 820);
+        animateTo(active, 820);
         carouselHub.restart();
       };
 
@@ -473,24 +483,22 @@
       });
     }
 
-    window.addEventListener("resize", () => {
-      measureStep();
+    function padForCenter() {
+      if (!track || !items[0]) return;
+      const pad = Math.max(12, track.clientWidth / 2 - items[0].offsetWidth / 2);
+      stack.style.paddingLeft = `${pad}px`;
+      stack.style.paddingRight = `${pad}px`;
       kick();
-    });
+    }
 
-    measureStep();
+    padForCenter();
+    window.addEventListener("resize", padForCenter);
     animateTo(0, 0);
     kick();
 
     carouselHub.register({
-      next: () => {
-        const nextIndex = (Math.round(normalizeProgress(progress)) + 1) % n;
-        animateTo(nextIndex, 1050);
-      },
-      prev: () => {
-        const prevIndex = (Math.round(normalizeProgress(progress)) - 1 + n) % n;
-        animateTo(prevIndex, 1050);
-      },
+      next: () => animateTo((active + 1) % items.length, 1050),
+      prev: () => animateTo((active - 1 + items.length) % items.length, 1050),
     });
     carouselHub.restart();
   }
