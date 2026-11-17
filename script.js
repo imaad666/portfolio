@@ -113,11 +113,29 @@
 
   function weeksForViewport(weeks) {
     if (!Array.isArray(weeks) || !weeks.length) return weeks || [];
-    // Phones can’t usefully show a full year — keep recent months
     const narrow = window.matchMedia("(max-width: 720px)").matches;
     if (!narrow) return weeks;
-    const keep = window.matchMedia("(max-width: 420px)").matches ? 18 : 22;
-    return weeks.length > keep ? weeks.slice(weeks.length - keep) : weeks;
+
+    // Fit as many recent weeks as the phone width can hold (flush to the right edge)
+    const daySize = window.matchMedia("(max-width: 420px)").matches ? 6.5 : 7;
+    const gap = 2;
+    const weekW = daySize + gap;
+    const available = Math.max(
+      14,
+      Math.floor((window.innerWidth - 28) / weekW)
+    );
+    const keep = Math.min(weeks.length, available);
+    return weeks.slice(weeks.length - keep);
+  }
+
+  function pinHeatmapToLatest() {
+    const wrap = document.querySelector(".heatmap-wrap");
+    const heatmap = document.getElementById("contributions-heatmap");
+    if (!wrap || !heatmap) return;
+
+    // Newest weeks sit against the right edge of the phone
+    heatmap.style.marginLeft = "auto";
+    wrap.scrollLeft = Math.max(0, wrap.scrollWidth - wrap.clientWidth);
   }
 
   function renderHeatmap({ total, weeks }) {
@@ -128,6 +146,7 @@
     totalEl.textContent = `${Number(total).toLocaleString()} commits`;
     fallbackEl.hidden = true;
     heatmap.innerHTML = "";
+    heatmap.style.marginLeft = "";
 
     weeksForViewport(weeks).forEach((week, weekIndex) => {
       const weekCol = document.createElement("div");
@@ -164,14 +183,11 @@
       heatmap.appendChild(weekCol);
     });
 
-    const wrap = document.querySelector(".heatmap-wrap");
-    if (wrap) {
-      // Pin to the newest weeks so the latest activity is what’s in view
-      requestAnimationFrame(() => {
-        wrap.scrollLeft = wrap.scrollWidth;
-      });
-    }
-
+    requestAnimationFrame(() => {
+      pinHeatmapToLatest();
+      // Second pass after layout settles (fonts / safe areas)
+      requestAnimationFrame(pinHeatmapToLatest);
+    });
   }
 
   async function loadGitHubContributions() {

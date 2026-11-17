@@ -384,6 +384,8 @@ a:focus-visible {
 }
 
 .heatmap-wrap {
+    display: flex;
+    justify-content: flex-end;
     overflow-x: auto;
     padding-bottom: 0.05rem;
     scrollbar-width: none;
@@ -399,6 +401,7 @@ a:focus-visible {
     gap: 2px;
     width: max-content;
     min-height: 54px;
+    margin-left: auto;
 }
 
 .heatmap .heatmap-day {
@@ -794,8 +797,9 @@ a:focus-visible {
     }
 
     .heatmap-wrap {
-        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
-        mask-image: linear-gradient(to right, transparent 0, #000 6%, #000 94%, transparent 100%);
+        /* Fade only the left (older) side — keep latest flush to the right edge */
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
+        mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
     }
 
     .badge-deck__track {
