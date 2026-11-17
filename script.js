@@ -258,6 +258,9 @@
     let scrollAnimId = 0;
     let loopId = 0;
     const auto = createAutoAdvance(4600);
+    // Touch / narrow screens: native snap scroll — custom drag fights iOS momentum
+    const touchy =
+      window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
 
     const visuals = items.map(() => ({
       scale: 0.78,
@@ -274,7 +277,30 @@
         item.classList.toggle("is-active", on);
         item.setAttribute("aria-selected", String(on));
         item.tabIndex = on ? 0 : -1;
+        if (touchy) {
+          // Let CSS handle focus look on mobile — clear inline transforms
+          item.style.transform = "";
+          item.style.filter = "";
+          item.style.opacity = "";
+          item.style.zIndex = "";
+        }
       });
+    }
+
+    function nearestIndex() {
+      if (!track || !items.length) return 0;
+      const mid = track.scrollLeft + track.clientWidth / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      items.forEach((item, i) => {
+        const center = item.offsetLeft + item.offsetWidth / 2;
+        const dist = Math.abs(center - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        }
+      });
+      return best;
     }
 
     function sampleTargets() {
@@ -299,10 +325,8 @@
 
         const t = px / (width * 0.95);
         const abs = Math.min(Math.abs(t), 2.4);
-        // Soft falloff so the focused badge clearly blooms
         const ease = 1 - Math.pow(1 - Math.min(abs / 1.25, 1), 1.65);
 
-        // Hide badges that would only show as half-cut edge scraps
         let edgeFade = 1;
         if (center < viewLeft) {
           edgeFade = Math.max(0, 1 - (viewLeft - center) / (width * 0.7));
@@ -333,10 +357,9 @@
 
     function tick() {
       loopId = 0;
-      if (!track || !items.length) return;
+      if (!track || !items.length || touchy) return;
 
       const targets = sampleTargets();
-      // Faster while dragging so it tracks the hand; slower otherwise = grace
       const k = dragging ? 0.5 : syncing ? 0.22 : 0.16;
       let stillMoving = dragging || syncing;
 
@@ -368,6 +391,7 @@
     }
 
     function kick() {
+      if (touchy) return;
       if (!loopId) loopId = requestAnimationFrame(tick);
     }
 
@@ -381,8 +405,16 @@
       if (!track || !items[index]) return;
       if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
 
-      const start = track.scrollLeft;
       const end = targetScrollLeft(index);
+
+      // Mobile: native smooth scroll + snap, no custom lerp drag
+      if (touchy) {
+        markActive(index);
+        track.scrollTo({ left: end, behavior: duration <= 0 ? "auto" : "smooth" });
+        return;
+      }
+
+      const start = track.scrollLeft;
       const delta = end - start;
 
       if (duration <= 0 || Math.abs(delta) < 0.5) {
@@ -399,7 +431,6 @@
 
       const step = (now) => {
         const p = Math.min(1, (now - t0) / duration);
-        // Ease-out quint — long glide into place
         const e = 1 - Math.pow(1 - p, 5);
         track.scrollLeft = start + delta * e;
         kick();
@@ -425,16 +456,26 @@
         }
         if (index !== active) {
           event.preventDefault();
-          animateTo(index, 1050);
+          animateTo(index, touchy ? 400 : 1050);
           auto.restart();
         }
       });
     });
 
     if (track) {
+      let scrollSettle = null;
       track.addEventListener(
         "scroll",
         () => {
+          if (touchy) {
+            const idx = nearestIndex();
+            if (idx !== active) markActive(idx);
+            clearTimeout(scrollSettle);
+            scrollSettle = setTimeout(() => {
+              auto.restart();
+            }, 180);
+            return;
+          }
           kick();
         },
         { passive: true }
@@ -443,6 +484,7 @@
       track.addEventListener(
         "wheel",
         (event) => {
+          if (touchy) return;
           if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
             event.preventDefault();
             track.scrollLeft += event.deltaY * 0.55;
@@ -453,39 +495,50 @@
         { passive: false }
       );
 
-      track.addEventListener("pointerdown", (event) => {
-        if (event.pointerType === "mouse" && event.button !== 0) return;
-        if (scrollAnimId) {
-          cancelAnimationFrame(scrollAnimId);
-          scrollAnimId = 0;
-          syncing = false;
-        }
-        dragging = true;
-        didDrag = false;
-        dragStartX = event.clientX;
-        dragScrollLeft = track.scrollLeft;
-        track.setPointerCapture(event.pointerId);
-        auto.pause();
-        kick();
-      });
+      // Desktop only — pointer drag kills native mobile momentum
+      if (!touchy) {
+        track.addEventListener("pointerdown", (event) => {
+          if (event.pointerType === "mouse" && event.button !== 0) return;
+          if (scrollAnimId) {
+            cancelAnimationFrame(scrollAnimId);
+            scrollAnimId = 0;
+            syncing = false;
+          }
+          dragging = true;
+          didDrag = false;
+          dragStartX = event.clientX;
+          dragScrollLeft = track.scrollLeft;
+          track.setPointerCapture(event.pointerId);
+          auto.pause();
+          kick();
+        });
 
-      track.addEventListener("pointermove", (event) => {
-        if (!dragging) return;
-        const dx = event.clientX - dragStartX;
-        if (Math.abs(dx) > 5) didDrag = true;
-        track.scrollLeft = dragScrollLeft - dx;
-        kick();
-      });
+        track.addEventListener("pointermove", (event) => {
+          if (!dragging) return;
+          const dx = event.clientX - dragStartX;
+          if (Math.abs(dx) > 5) didDrag = true;
+          track.scrollLeft = dragScrollLeft - dx;
+          kick();
+        });
 
-      const endDrag = () => {
-        if (!dragging) return;
-        dragging = false;
-        animateTo(active, 820);
-        auto.restart();
-      };
+        const endDrag = () => {
+          if (!dragging) return;
+          dragging = false;
+          animateTo(active, 820);
+          auto.restart();
+        };
 
-      track.addEventListener("pointerup", endDrag);
-      track.addEventListener("pointercancel", endDrag);
+        track.addEventListener("pointerup", endDrag);
+        track.addEventListener("pointercancel", endDrag);
+      } else {
+        track.addEventListener(
+          "touchstart",
+          () => {
+            auto.pause();
+          },
+          { passive: true }
+        );
+      }
 
       track.addEventListener("keydown", (event) => {
         if (event.key === "ArrowRight") {
@@ -506,6 +559,7 @@
       stack.style.paddingLeft = `${pad}px`;
       stack.style.paddingRight = `${pad}px`;
       kick();
+      if (touchy) markActive(nearestIndex());
     }
 
     padForCenter();
@@ -514,8 +568,9 @@
     kick();
 
     auto.bind({
-      next: () => animateTo((active + 1) % items.length, 1050),
-      prev: () => animateTo((active - 1 + items.length) % items.length, 1050),
+      next: () => animateTo((active + 1) % items.length, touchy ? 450 : 1050),
+      prev: () =>
+        animateTo((active - 1 + items.length) % items.length, touchy ? 450 : 1050),
     });
     auto.restart();
   }

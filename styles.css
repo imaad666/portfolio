@@ -833,20 +833,46 @@ a:focus-visible {
     }
 
     .badge-deck__track {
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: calc(50% - (var(--badge-size) / 2));
         -webkit-mask-image: linear-gradient(
             to right,
             transparent 0,
-            #000 16%,
-            #000 84%,
+            #000 10%,
+            #000 90%,
             transparent 100%
         );
         mask-image: linear-gradient(
             to right,
             transparent 0,
-            #000 16%,
-            #000 84%,
+            #000 10%,
+            #000 90%,
             transparent 100%
         );
+    }
+
+    .badge-deck__item {
+        /* Less overlap so swipe + tap feel natural */
+        margin-left: calc(var(--badge-size) * -0.18);
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+        transition:
+            transform 0.35s ease,
+            filter 0.35s ease,
+            opacity 0.35s ease;
+    }
+
+    .badge-deck__item.is-active {
+        filter: grayscale(0) contrast(1.05);
+        opacity: 1;
+        transform: scale(1.08);
+        z-index: 8;
+    }
+
+    .badge-deck__item:not(.is-active) {
+        filter: grayscale(1) contrast(1.05);
+        opacity: 0.55;
+        transform: scale(0.9);
     }
 
     .project-deck {
