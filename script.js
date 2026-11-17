@@ -96,7 +96,7 @@
     const totalEl = document.getElementById("contributions-total");
     const fallbackEl = document.getElementById("contributions-fallback");
 
-    totalEl.textContent = `${Number(total).toLocaleString()} · year`;
+    totalEl.textContent = `${Number(total).toLocaleString()} commits`;
     fallbackEl.hidden = true;
     heatmap.innerHTML = "";
 
@@ -270,9 +270,9 @@
         const t = px / (width * 1.05);
         const abs = Math.min(Math.abs(t), 2.2);
         const ease = Math.min(abs / 1.15, 1);
-        const scale = 1.1 - ease * 0.2;
-        const lift = (1 - ease) * 0.1;
-        const rotate = Math.max(-3.5, Math.min(3.5, t * -2));
+        const scale = 1.08 - ease * 0.18;
+        const lift = (1 - ease) * 0.06;
+        const rotate = Math.max(-2.5, Math.min(2.5, t * -1.6));
         const gray = Math.min(1, ease * 1.1);
         const opacity = 1 - ease * 0.32;
 
@@ -473,9 +473,6 @@
     if (!items.length) return;
     const prevBtn = document.getElementById("project-prev");
     const nextBtn = document.getElementById("project-next");
-    const countEl = document.getElementById("project-count");
-
-    if (countEl) countEl.textContent = String(items.length);
 
     let index = 0;
 
@@ -486,7 +483,6 @@
         item.classList.toggle("is-active", active);
         item.setAttribute("aria-hidden", String(!active));
       });
-      if (countEl) countEl.textContent = `${nextIndex + 1} / ${items.length}`;
     }
 
     function next() {

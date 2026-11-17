@@ -22,7 +22,7 @@
     --cell-bg: rgba(250, 251, 248, 0.42);
     --cell-radius: 0.85rem;
     --badge-size: 3.55rem;
-    --coverflow-h: 5rem;
+    --coverflow-h: 5.75rem;
 }
 
 *,
@@ -212,7 +212,10 @@ body {
 
 .tile--work { animation-delay: 0.1s; }
 .tile--activity { animation-delay: 0.16s; }
-.tile--badges { animation-delay: 0.2s; }
+.tile--badges {
+    animation-delay: 0.2s;
+    overflow: visible;
+}
 .tile--projects { animation-delay: 0.26s; }
 .tile--photos { animation-delay: 0.32s; }
 
@@ -269,36 +272,44 @@ body {
 
 .identity__links {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 0.55rem;
-    margin-top: 0.45rem;
+    gap: 0.55rem 0.85rem;
+    margin-top: 0.4rem;
+    font-size: 0.88em;
 }
 
 .social {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 1.05rem;
-    height: 1.05rem;
-    color: var(--ink-soft);
-    text-decoration: none;
-    opacity: 0.72;
-    transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+    gap: 0.28rem;
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: rgba(20, 24, 22, 0.28);
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .social svg {
     display: block;
-    width: 100%;
-    height: 100%;
+    width: 0.68rem;
+    height: 0.68rem;
+    flex-shrink: 0;
+    opacity: 0.85;
 }
 
 .social:hover,
 .social:focus-visible {
     color: var(--accent);
-    opacity: 1;
-    text-decoration: none;
-    transform: translateY(-1px);
+    text-decoration-color: var(--accent);
     outline: none;
+}
+
+.dot {
+    margin: 0 0.28em;
+    color: var(--muted);
+    user-select: none;
 }
 
 /* —— Links —— */
@@ -366,7 +377,7 @@ a:focus-visible {
 .job__logo {
     display: block;
     width: auto;
-    height: 0.95rem;
+    height: 0.72rem;
     object-fit: contain;
     filter: grayscale(1) contrast(1.15);
     opacity: 0.88;
@@ -470,7 +481,9 @@ a:focus-visible {
     position: relative;
     flex: 1 1 auto;
     min-height: var(--coverflow-h);
+    margin-top: 0.1rem;
     background: transparent;
+    overflow: visible;
 }
 
 .badge-deck__track {
@@ -489,6 +502,9 @@ a:focus-visible {
     background: transparent;
     cursor: grab;
     touch-action: pan-x;
+    /* Extra top room so focused circular badges aren’t clipped */
+    padding-top: 0.45rem;
+    box-sizing: border-box;
 }
 
 .badge-deck__track::-webkit-scrollbar {
@@ -506,11 +522,11 @@ a:focus-visible {
 
 .badge-deck__strip {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     height: 100%;
-    min-height: var(--coverflow-h);
+    min-height: calc(var(--coverflow-h) - 0.45rem);
     width: max-content;
-    padding-block: 0.35rem;
+    padding-bottom: 0.35rem;
     padding-inline: 1rem; /* JS sets side pads so first/last can snap center */
     background: transparent;
 }
@@ -709,7 +725,7 @@ a:focus-visible {
         --col-gap: 0.7rem;
         --cell-pad: 0.55rem;
         --badge-size: 2.85rem;
-        --coverflow-h: 4.1rem;
+        --coverflow-h: 4.75rem;
     }
 
     body {
@@ -806,7 +822,7 @@ a:focus-visible {
     :root {
         --row-gap: 0.55rem;
         --badge-size: 2.6rem;
-        --coverflow-h: 3.8rem;
+        --coverflow-h: 4.4rem;
         --cell-pad: 0.5rem;
     }
 
