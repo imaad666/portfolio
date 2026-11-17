@@ -1,26 +1,33 @@
 (function () {
   const LOGIN = "imaad666";
 
-  // Shared pulse so badges + projects advance together
-  const carouselHub = {
-    controllers: [],
-    timerId: null,
-    period: 4600,
-    register(controller) {
-      this.controllers.push(controller);
-    },
-    next() {
-      this.controllers.forEach((controller) => controller.next?.());
-    },
-    prev() {
-      this.controllers.forEach((controller) => controller.prev?.());
-    },
-    restart() {
-      if (this.timerId) clearInterval(this.timerId);
-      if (this.controllers.length < 1) return;
-      this.timerId = setInterval(() => this.next(), this.period);
-    },
-  };
+  // Independent auto-advance for each strip (not synced)
+  function createAutoAdvance(period) {
+    let timerId = null;
+    let nextFn = null;
+    let prevFn = null;
+    return {
+      bind({ next, prev }) {
+        nextFn = next;
+        prevFn = prev;
+      },
+      next() {
+        nextFn?.();
+      },
+      prev() {
+        prevFn?.();
+      },
+      pause() {
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+      },
+      restart() {
+        this.pause();
+        if (!nextFn) return;
+        timerId = setInterval(() => nextFn(), period);
+      },
+    };
+  }
 
   const LEVELS = [
     null,
@@ -241,6 +248,7 @@
     let syncing = false;
     let scrollAnimId = 0;
     let loopId = 0;
+    const auto = createAutoAdvance(4600);
 
     const visuals = items.map(() => ({
       scale: 0.78,
@@ -409,7 +417,7 @@
         if (index !== active) {
           event.preventDefault();
           animateTo(index, 1050);
-          carouselHub.restart();
+          auto.restart();
         }
       });
     });
@@ -431,7 +439,7 @@
             track.scrollLeft += event.deltaY * 0.55;
           }
           kick();
-          carouselHub.restart();
+          auto.restart();
         },
         { passive: false }
       );
@@ -448,7 +456,7 @@
         dragStartX = event.clientX;
         dragScrollLeft = track.scrollLeft;
         track.setPointerCapture(event.pointerId);
-        if (carouselHub.timerId) clearInterval(carouselHub.timerId);
+        auto.pause();
         kick();
       });
 
@@ -464,7 +472,7 @@
         if (!dragging) return;
         dragging = false;
         animateTo(active, 820);
-        carouselHub.restart();
+        auto.restart();
       };
 
       track.addEventListener("pointerup", endDrag);
@@ -473,12 +481,12 @@
       track.addEventListener("keydown", (event) => {
         if (event.key === "ArrowRight") {
           event.preventDefault();
-          carouselHub.next();
-          carouselHub.restart();
+          auto.next();
+          auto.restart();
         } else if (event.key === "ArrowLeft") {
           event.preventDefault();
-          carouselHub.prev();
-          carouselHub.restart();
+          auto.prev();
+          auto.restart();
         }
       });
     }
@@ -496,11 +504,11 @@
     animateTo(0, 0);
     kick();
 
-    carouselHub.register({
+    auto.bind({
       next: () => animateTo((active + 1) % items.length, 1050),
       prev: () => animateTo((active - 1 + items.length) % items.length, 1050),
     });
-    carouselHub.restart();
+    auto.restart();
   }
 
   async function loadBadges() {
@@ -547,6 +555,7 @@
     let syncing = false;
     let scrollAnimId = 0;
     let loopId = 0;
+    const auto = createAutoAdvance(6200);
 
     const visuals = items.map(() => ({
       scale: 0.94,
@@ -686,7 +695,7 @@
         }
         if (index !== active) {
           animateTo(index, 1050);
-          carouselHub.restart();
+          auto.restart();
         }
       });
     });
@@ -701,7 +710,7 @@
           track.scrollLeft += event.deltaY * 0.55;
         }
         kick();
-        carouselHub.restart();
+        auto.restart();
       },
       { passive: false }
     );
@@ -719,7 +728,7 @@
       dragStartX = event.clientX;
       dragScrollLeft = track.scrollLeft;
       track.setPointerCapture(event.pointerId);
-      if (carouselHub.timerId) clearInterval(carouselHub.timerId);
+      auto.pause();
       kick();
     });
 
@@ -735,7 +744,7 @@
       if (!dragging) return;
       dragging = false;
       animateTo(active, 820);
-      carouselHub.restart();
+      auto.restart();
     };
 
     track.addEventListener("pointerup", endDrag);
@@ -744,12 +753,12 @@
     track.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        carouselHub.next();
-        carouselHub.restart();
+        auto.next();
+        auto.restart();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        carouselHub.prev();
-        carouselHub.restart();
+        auto.prev();
+        auto.restart();
       }
     });
 
@@ -765,11 +774,11 @@
     animateTo(0, 0);
     kick();
 
-    carouselHub.register({
+    auto.bind({
       next: () => animateTo((active + 1) % items.length, 1050),
       prev: () => animateTo((active - 1 + items.length) % items.length, 1050),
     });
-    carouselHub.restart();
+    auto.restart();
   }
 
   document.addEventListener("DOMContentLoaded", initProjectCarousel);
