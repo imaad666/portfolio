@@ -575,8 +575,8 @@ a:focus-visible {
     text-decoration: none;
     transform: scale(0.86) rotate(-4deg);
     transform-origin: center bottom;
-    filter: grayscale(0.4) contrast(1.04);
-    opacity: 0.72;
+    filter: grayscale(1) contrast(1.08);
+    opacity: 0.62;
     z-index: 1;
     transition:
         transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
