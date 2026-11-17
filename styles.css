@@ -492,40 +492,28 @@ a:focus-visible {
     position: relative;
     height: var(--coverflow-h);
     min-height: var(--coverflow-h);
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: none;
-    scroll-padding-inline: calc(50% - (var(--badge-size) / 2));
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scroll-behavior: auto;
-    scrollbar-width: none;
+    overflow: hidden;
     outline: none;
     background: transparent;
     cursor: grab;
     touch-action: pan-x;
-    /* Extra top room so focused circular badges aren’t clipped */
     padding-top: 0.55rem;
     box-sizing: border-box;
-    /* Kill half-cut badges at the compartment edges */
+    /* Soft edges — no half-cut scraps */
     -webkit-mask-image: linear-gradient(
         to right,
         transparent 0,
-        #000 12%,
-        #000 88%,
+        #000 14%,
+        #000 86%,
         transparent 100%
     );
     mask-image: linear-gradient(
         to right,
         transparent 0,
-        #000 12%,
-        #000 88%,
+        #000 14%,
+        #000 86%,
         transparent 100%
     );
-}
-
-.badge-deck__track::-webkit-scrollbar {
-    display: none;
 }
 
 .badge-deck__track:active {
@@ -538,35 +526,28 @@ a:focus-visible {
 }
 
 .badge-deck__strip {
-    display: flex;
-    align-items: flex-end;
+    position: relative;
+    width: 100%;
     height: 100%;
     min-height: calc(var(--coverflow-h) - 0.45rem);
-    width: max-content;
-    padding-bottom: 0.35rem;
-    padding-inline: 1rem; /* JS sets side pads so first/last can snap center */
     background: transparent;
 }
 
 .badge-deck__item {
-    position: relative;
-    flex: 0 0 auto;
+    position: absolute;
+    left: 50%;
+    bottom: 0.35rem;
     width: var(--badge-size);
     height: var(--badge-size);
-    margin-left: calc(var(--badge-size) * -0.42);
-    scroll-snap-align: center;
+    margin: 0;
     text-decoration: none;
-    transform: translate3d(0, 0, 0) scale(0.78);
+    transform: translate3d(-50%, 0, 0) scale(0.78);
     transform-origin: center bottom;
     filter: grayscale(1) contrast(1.05);
-    opacity: 0.42;
+    opacity: 0;
     z-index: 1;
     will-change: transform, filter, opacity;
     background: transparent;
-}
-
-.badge-deck__item:first-child {
-    margin-left: 0;
 }
 
 .badge-deck__item img {
