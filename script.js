@@ -87,29 +87,6 @@
     }, 0);
   }
 
-  function renderSkeleton() {
-    const skeletonEl = document.getElementById("heatmap-skeleton");
-    if (!skeletonEl || skeletonEl.childElementCount) return;
-
-    for (let w = 0; w < HEATMAP_WEEKS; w++) {
-      const weekCol = document.createElement("div");
-      weekCol.className = "heatmap-week";
-
-      for (let d = 0; d < 7; d++) {
-        const cell = document.createElement("div");
-        cell.className = "heatmap-day";
-        weekCol.appendChild(cell);
-      }
-
-      skeletonEl.appendChild(weekCol);
-    }
-  }
-
-  function hideSkeleton() {
-    const skeletonEl = document.getElementById("heatmap-skeleton");
-    if (skeletonEl) skeletonEl.classList.add("is-hidden");
-  }
-
   function renderMonthLabels(orderedWeeks) {
     const monthsEl = document.getElementById("heatmap-months");
     if (!monthsEl) return;
@@ -200,7 +177,6 @@
       });
     }
 
-    hideSkeleton();
   }
 
   async function loadGitHubContributions() {
@@ -209,8 +185,6 @@
     const fallbackEl = document.getElementById("contributions-fallback");
 
     if (!heatmap || !totalEl || !fallbackEl) return;
-
-    renderSkeleton();
 
     try {
       let payload;
@@ -225,16 +199,10 @@
       fallbackEl.hidden = false;
       fallbackEl.textContent = "Could not load contribution data right now.";
       heatmap.innerHTML = "";
-      hideSkeleton();
     }
   }
 
   document.addEventListener("DOMContentLoaded", loadGitHubContributions);
-
-  function hideBadgeSkeleton() {
-    const skeletonEl = document.getElementById("badge-skeleton");
-    if (skeletonEl) skeletonEl.classList.add("is-hidden");
-  }
 
   async function fetchBadgeSource(url) {
     const response = await fetch(url);
@@ -265,7 +233,6 @@
     if (!stack || !fallbackEl) return;
 
     stack.innerHTML = "";
-    hideBadgeSkeleton();
 
     if (!badges.length) {
       fallbackEl.hidden = false;
@@ -471,7 +438,6 @@
 
       renderBadgeDeck(badges);
     } catch (error) {
-      hideBadgeSkeleton();
       fallbackEl.hidden = false;
       fallbackEl.textContent = "Could not load badges right now.";
       stack.innerHTML = "";

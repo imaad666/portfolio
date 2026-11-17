@@ -239,11 +239,6 @@ body {
     .badge-deck__item {
         transition: none;
     }
-
-    .heatmap-skeleton::after,
-    .badge-skeleton__dot::after {
-        animation: none;
-    }
 }
 
 /* —— Identity —— */
@@ -428,38 +423,6 @@ a:focus-visible {
     min-height: 54px;
 }
 
-.heatmap-skeleton {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    gap: 2px;
-    overflow: hidden;
-    opacity: 1;
-    transition: opacity 0.4s ease;
-}
-
-.heatmap-skeleton.is-hidden {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.heatmap-skeleton .heatmap-day {
-    background: var(--heat-1);
-}
-
-.heatmap-skeleton::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(100deg, transparent 25%, rgba(255, 255, 252, 0.7) 50%, transparent 75%);
-    animation: skeleton-shimmer 2s ease-in-out infinite;
-}
-
-@keyframes skeleton-shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
 .heatmap {
     display: flex;
     gap: 2px;
@@ -542,8 +505,7 @@ a:focus-visible {
     border-radius: 0.4rem;
 }
 
-.badge-deck__strip,
-.badge-skeleton {
+.badge-deck__strip {
     display: flex;
     align-items: center;
     height: 100%;
@@ -552,17 +514,6 @@ a:focus-visible {
     padding-block: 0.35rem;
     padding-inline: 1rem; /* JS sets side pads so first/last can snap center */
     background: transparent;
-}
-
-.badge-skeleton {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    transition: opacity 0.35s ease;
-}
-
-.badge-skeleton.is-hidden {
-    opacity: 0;
 }
 
 .badge-deck__item {
@@ -586,8 +537,7 @@ a:focus-visible {
     background: transparent;
 }
 
-.badge-deck__item:first-child,
-.badge-skeleton .badge-deck__item:first-child {
+.badge-deck__item:first-child {
     margin-left: 0;
 }
 
@@ -615,28 +565,6 @@ a:focus-visible {
     outline: none;
     filter: grayscale(0) contrast(1.05);
     opacity: 1;
-}
-
-.badge-deck__item.badge-skeleton__dot {
-    background: var(--heat-1);
-    border-radius: 50%;
-    filter: none;
-    opacity: 1;
-    overflow: hidden;
-}
-
-.badge-skeleton__dot:nth-child(1) { transform: scale(0.86) rotate(-8deg); z-index: 1; }
-.badge-skeleton__dot:nth-child(2) { transform: scale(0.92) rotate(-2deg); z-index: 2; }
-.badge-skeleton__dot:nth-child(3) { transform: scale(1.05); z-index: 3; }
-.badge-skeleton__dot:nth-child(4) { transform: scale(0.92) rotate(2deg); z-index: 2; }
-.badge-skeleton__dot:nth-child(5) { transform: scale(0.86) rotate(8deg); z-index: 1; }
-
-.badge-skeleton__dot::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(100deg, transparent 25%, rgba(255, 255, 252, 0.7) 50%, transparent 75%);
-    animation: skeleton-shimmer 1.8s ease-in-out infinite;
 }
 
 .badge-fallback {
