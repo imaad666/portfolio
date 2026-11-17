@@ -492,28 +492,40 @@ a:focus-visible {
     position: relative;
     height: var(--coverflow-h);
     min-height: var(--coverflow-h);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: none;
+    scroll-padding-inline: calc(50% - (var(--badge-size) / 2));
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-behavior: auto;
+    scrollbar-width: none;
     outline: none;
     background: transparent;
     cursor: grab;
     touch-action: pan-x;
+    /* Extra top room so focused circular badges aren’t clipped */
     padding-top: 0.55rem;
     box-sizing: border-box;
-    /* Soft edges — no half-cut scraps */
+    /* Kill half-cut badges at the compartment edges */
     -webkit-mask-image: linear-gradient(
         to right,
         transparent 0,
-        #000 14%,
-        #000 86%,
+        #000 12%,
+        #000 88%,
         transparent 100%
     );
     mask-image: linear-gradient(
         to right,
         transparent 0,
-        #000 14%,
-        #000 86%,
+        #000 12%,
+        #000 88%,
         transparent 100%
     );
+}
+
+.badge-deck__track::-webkit-scrollbar {
+    display: none;
 }
 
 .badge-deck__track:active {
@@ -526,28 +538,35 @@ a:focus-visible {
 }
 
 .badge-deck__strip {
-    position: relative;
-    width: 100%;
+    display: flex;
+    align-items: flex-end;
     height: 100%;
     min-height: calc(var(--coverflow-h) - 0.45rem);
+    width: max-content;
+    padding-bottom: 0.35rem;
+    padding-inline: 1rem; /* JS sets side pads so first/last can snap center */
     background: transparent;
 }
 
 .badge-deck__item {
-    position: absolute;
-    left: 50%;
-    bottom: 0.35rem;
+    position: relative;
+    flex: 0 0 auto;
     width: var(--badge-size);
     height: var(--badge-size);
-    margin: 0;
+    margin-left: calc(var(--badge-size) * -0.42);
+    scroll-snap-align: center;
     text-decoration: none;
-    transform: translate3d(-50%, 0, 0) scale(0.78);
+    transform: translate3d(0, 0, 0) scale(0.78);
     transform-origin: center bottom;
     filter: grayscale(1) contrast(1.05);
-    opacity: 0;
+    opacity: 0.42;
     z-index: 1;
     will-change: transform, filter, opacity;
     background: transparent;
+}
+
+.badge-deck__item:first-child {
+    margin-left: 0;
 }
 
 .badge-deck__item img {
@@ -581,84 +600,80 @@ a:focus-visible {
     font-style: italic;
 }
 
-/* —— Projects —— */
-.project-stack-wrap {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-height: 0;
-}
-
-.project-stack {
-    flex: 1 1 auto;
-    min-width: 0;
+/* —— Projects (horizontal strip, badge-style) —— */
+.project-deck {
     position: relative;
-    min-height: 3.8rem;
+    flex: 1 1 auto;
+    min-height: 3.9rem;
+    overflow: visible;
 }
 
-.project-arrow {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.35rem;
-    height: 1.35rem;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    padding: 0;
-    cursor: pointer;
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.project-arrow svg {
-    display: block;
-    width: 0.8rem;
-    height: 0.8rem;
-}
-
-.project-arrow:hover,
-.project-arrow:focus-visible {
-    color: var(--ink);
+.project-deck__track {
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    cursor: grab;
+    touch-action: pan-x;
     outline: none;
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 10%,
+        #000 90%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 10%,
+        #000 90%,
+        transparent 100%
+    );
 }
 
-.project-arrow--prev:hover,
-.project-arrow--prev:focus-visible {
-    transform: translateX(-2px);
+.project-deck__track::-webkit-scrollbar {
+    display: none;
 }
 
-.project-arrow--next:hover,
-.project-arrow--next:focus-visible {
-    transform: translateX(2px);
+.project-deck__track:active {
+    cursor: grabbing;
 }
 
-.project-arrow:disabled {
-    opacity: 0.3;
-    cursor: default;
+.project-deck__track:focus-visible {
+    box-shadow: inset 0 0 0 1px var(--accent);
+    border-radius: 0.35rem;
 }
 
-.project-arrow:disabled:hover {
-    transform: none;
+.project-deck__strip {
+    display: flex;
+    align-items: stretch;
+    gap: 1.1rem;
+    width: max-content;
+    padding-block: 0.2rem;
 }
 
-.project-stack__item {
-    position: absolute;
-    inset: 0;
-    padding: 0.15rem 0;
-    opacity: 0;
-    transform: translateY(0.35rem);
-    pointer-events: none;
-    transition:
-        opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+.project-deck__item {
+    flex: 0 0 auto;
+    width: min(16.5rem, 72vw);
+    padding: 0.1rem 0.15rem;
+    opacity: 0.45;
+    transform: scale(0.94);
+    transform-origin: center center;
+    will-change: transform, opacity;
 }
 
-.project-stack__item.is-active {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
+.project-deck__item.is-active {
     z-index: 2;
+}
+
+.project-deck__item .proof__blurb {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* —— Photo repos (SVG placeholders) —— */
@@ -779,16 +794,16 @@ a:focus-visible {
         min-height: 52px;
     }
 
-    .project-stack {
+    .project-deck {
         min-height: 3.35rem;
+    }
+
+    .project-deck__item {
+        width: min(14.5rem, 78vw);
     }
 
     .proof__blurb {
         font-size: 0.85em;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
     }
 
     .photo-slot {
@@ -849,7 +864,7 @@ a:focus-visible {
         min-height: 50px;
     }
 
-    .project-stack {
+    .project-deck {
         min-height: 3.2rem;
     }
 

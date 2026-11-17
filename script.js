@@ -534,53 +534,241 @@
   document.addEventListener("DOMContentLoaded", loadBadges);
 
   function initProjectCarousel() {
-    const items = Array.from(document.querySelectorAll(".project-stack__item"));
-    if (!items.length) return;
-    const prevBtn = document.getElementById("project-prev");
-    const nextBtn = document.getElementById("project-next");
+    const track = document.getElementById("project-track");
+    const strip = document.getElementById("project-stack");
+    const items = Array.from(document.querySelectorAll(".project-deck__item"));
+    if (!track || !strip || !items.length) return;
 
-    let index = 0;
+    let active = 0;
+    let dragStartX = 0;
+    let dragScrollLeft = 0;
+    let dragging = false;
+    let didDrag = false;
+    let syncing = false;
+    let scrollAnimId = 0;
+    let loopId = 0;
 
-    function setActive(nextIndex) {
-      index = nextIndex;
+    const visuals = items.map(() => ({
+      scale: 0.94,
+      opacity: 0.45,
+    }));
+
+    items.forEach((item, index) => {
+      item.dataset.index = String(index);
+    });
+
+    function markActive(index) {
+      active = index;
       items.forEach((item, i) => {
-        const active = i === nextIndex;
-        item.classList.toggle("is-active", active);
-        item.setAttribute("aria-hidden", String(!active));
+        const on = i === index;
+        item.classList.toggle("is-active", on);
+        item.setAttribute("aria-selected", String(on));
+        item.tabIndex = on ? 0 : -1;
       });
     }
 
-    function next() {
-      setActive((index + 1) % items.length);
+    function sampleTargets() {
+      const mid = track.scrollLeft + track.clientWidth / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      const edgePad = track.clientWidth * 0.12;
+      const viewLeft = track.scrollLeft + edgePad;
+      const viewRight = track.scrollLeft + track.clientWidth - edgePad;
+
+      const targets = items.map((item, i) => {
+        const width = item.offsetWidth || 1;
+        const center = item.offsetLeft + width / 2;
+        const absPx = Math.abs(center - mid);
+        if (absPx < bestDist) {
+          bestDist = absPx;
+          best = i;
+        }
+
+        const abs = Math.min(absPx / (width * 0.9), 2);
+        const ease = Math.min(abs / 1.2, 1);
+        let edgeFade = 1;
+        if (center < viewLeft) {
+          edgeFade = Math.max(0, 1 - (viewLeft - center) / (width * 0.65));
+        } else if (center > viewRight) {
+          edgeFade = Math.max(0, 1 - (center - viewRight) / (width * 0.65));
+        }
+
+        return {
+          scale: 1.02 - ease * 0.1,
+          opacity: Math.max(0, (1 - ease * 0.55) * edgeFade),
+        };
+      });
+
+      if (best !== active) markActive(best);
+      return targets;
     }
 
-    function prev() {
-      setActive((index - 1 + items.length) % items.length);
+    function tick() {
+      loopId = 0;
+      const targets = sampleTargets();
+      const k = dragging ? 0.5 : syncing ? 0.22 : 0.16;
+      let stillMoving = dragging || syncing;
+
+      items.forEach((item, i) => {
+        const visual = visuals[i];
+        const target = targets[i];
+        if (!target) return;
+        visual.scale += (target.scale - visual.scale) * k;
+        visual.opacity += (target.opacity - visual.opacity) * k;
+        if (
+          Math.abs(target.scale - visual.scale) > 0.0015 ||
+          Math.abs(target.opacity - visual.opacity) > 0.004
+        ) {
+          stillMoving = true;
+        }
+        item.style.transform = `scale(${visual.scale})`;
+        item.style.opacity = String(visual.opacity);
+      });
+
+      if (stillMoving) loopId = requestAnimationFrame(tick);
     }
 
-    setActive(index);
-
-    if (items.length === 1) {
-      if (prevBtn) prevBtn.disabled = true;
-      if (nextBtn) nextBtn.disabled = true;
-      return;
+    function kick() {
+      if (!loopId) loopId = requestAnimationFrame(tick);
     }
 
-    if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
-        carouselHub.prev();
+    function targetScrollLeft(index) {
+      const item = items[index];
+      if (!item) return 0;
+      return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
+    }
+
+    function animateTo(index, duration = 980) {
+      if (!items[index]) return;
+      if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
+
+      const start = track.scrollLeft;
+      const end = targetScrollLeft(index);
+      const delta = end - start;
+
+      if (duration <= 0 || Math.abs(delta) < 0.5) {
+        track.scrollLeft = end;
+        syncing = false;
+        markActive(index);
+        kick();
+        return;
+      }
+
+      syncing = true;
+      const t0 = performance.now();
+      kick();
+
+      const step = (now) => {
+        const p = Math.min(1, (now - t0) / duration);
+        const e = 1 - Math.pow(1 - p, 5);
+        track.scrollLeft = start + delta * e;
+        kick();
+        if (p < 1) {
+          scrollAnimId = requestAnimationFrame(step);
+        } else {
+          scrollAnimId = 0;
+          syncing = false;
+          markActive(index);
+          kick();
+        }
+      };
+
+      scrollAnimId = requestAnimationFrame(step);
+    }
+
+    items.forEach((item, index) => {
+      item.addEventListener("click", (event) => {
+        if (event.target.closest("a")) return;
+        if (didDrag) {
+          event.preventDefault();
+          didDrag = false;
+          return;
+        }
+        if (index !== active) {
+          animateTo(index, 1050);
+          carouselHub.restart();
+        }
+      });
+    });
+
+    track.addEventListener("scroll", () => kick(), { passive: true });
+
+    track.addEventListener(
+      "wheel",
+      (event) => {
+        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+          event.preventDefault();
+          track.scrollLeft += event.deltaY * 0.55;
+        }
+        kick();
         carouselHub.restart();
-      });
-    }
+      },
+      { passive: false }
+    );
 
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
+    track.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      if (event.target.closest("a")) return;
+      if (scrollAnimId) {
+        cancelAnimationFrame(scrollAnimId);
+        scrollAnimId = 0;
+        syncing = false;
+      }
+      dragging = true;
+      didDrag = false;
+      dragStartX = event.clientX;
+      dragScrollLeft = track.scrollLeft;
+      track.setPointerCapture(event.pointerId);
+      if (carouselHub.timerId) clearInterval(carouselHub.timerId);
+      kick();
+    });
+
+    track.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      const dx = event.clientX - dragStartX;
+      if (Math.abs(dx) > 5) didDrag = true;
+      track.scrollLeft = dragScrollLeft - dx;
+      kick();
+    });
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      animateTo(active, 820);
+      carouselHub.restart();
+    };
+
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+
+    track.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
         carouselHub.next();
         carouselHub.restart();
-      });
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        carouselHub.prev();
+        carouselHub.restart();
+      }
+    });
+
+    function padForCenter() {
+      const pad = Math.max(16, track.clientWidth / 2 - items[0].offsetWidth / 2);
+      strip.style.paddingLeft = `${pad}px`;
+      strip.style.paddingRight = `${pad}px`;
+      kick();
     }
 
-    carouselHub.register({ next, prev });
+    padForCenter();
+    window.addEventListener("resize", padForCenter);
+    animateTo(0, 0);
+    kick();
+
+    carouselHub.register({
+      next: () => animateTo((active + 1) % items.length, 1050),
+      prev: () => animateTo((active - 1 + items.length) % items.length, 1050),
+    });
     carouselHub.restart();
   }
 
