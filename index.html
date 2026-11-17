@@ -56,7 +56,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=40">
+    <link rel="stylesheet" href="styles.css?v=41">
 </head>
 
 <body>
@@ -82,17 +82,35 @@
                         height="96" fetchpriority="high">
                     <div class="identity__copy">
                         <h1 class="identity__name">Imaad Bin Irshad</h1>
-                        <p class="identity__links">
-                            <a href="https://github.com/imaad666" target="_blank"
-                                rel="noopener noreferrer">github</a>
-                            <span class="dot" aria-hidden="true">·</span>
-                            <a href="https://www.linkedin.com/in/imaadwani/" target="_blank"
-                                rel="noopener noreferrer">linkedin</a>
-                            <span class="dot" aria-hidden="true">·</span>
-                            <a href="https://x.com/thenotoriousimi" target="_blank"
-                                rel="noopener noreferrer">x</a>
-                            <span class="dot" aria-hidden="true">·</span>
-                            <a href="mailto:imaadbinirshad@gmail.com">mail</a>
+                        <p class="identity__links" aria-label="Social links">
+                            <a class="social" href="https://github.com/imaad666" target="_blank"
+                                rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor"
+                                        d="M12 2C6.48 2 2 6.58 2 12.26c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.27 2.75 1.05A9.3 9.3 0 0 1 12 7.5c.85 0 1.71.12 2.51.35 1.9-1.32 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .26.18.59.69.48A10.03 10.03 0 0 0 22 12.26C22 6.58 17.52 2 12 2z" />
+                                </svg>
+                            </a>
+                            <a class="social" href="https://www.linkedin.com/in/imaadwani/" target="_blank"
+                                rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor"
+                                        d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.84-2.05 3.79-2.05 4.05 0 4.8 2.67 4.8 6.14V23h-4v-6.6c0-1.57-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.49V23h-4V8.5z" />
+                                </svg>
+                            </a>
+                            <a class="social" href="https://x.com/thenotoriousimi" target="_blank"
+                                rel="noopener noreferrer" aria-label="X" title="X">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor"
+                                        d="M18.9 2H22l-6.78 7.75L23 22h-6.55l-5.13-6.7L5.4 22H2.28l7.25-8.28L1 2h6.72l4.63 6.14L18.9 2zm-1.15 18h1.8L6.4 3.9H4.47L17.75 20z" />
+                                </svg>
+                            </a>
+                            <a class="social" href="mailto:imaadbinirshad@gmail.com" aria-label="Email"
+                                title="Email">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="currentColor"
+                                        d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5L4 8V6l8 5 8-5v2z" />
+                                </svg>
+                            </a>
                         </p>
                     </div>
                 </header>
@@ -298,10 +316,10 @@
                 </div>
             </section>
 
-            <!-- Row 4: photo repos (SVG slot) -->
+            <!-- Row 4: art marks (SVG slot) -->
             <section class="tile tile--photos" aria-labelledby="photos-heading">
-                <h2 id="photos-heading" class="tile__label">photo repos</h2>
-                <div class="photo-slot" aria-label="Photo repository marks">
+                <h2 id="photos-heading" class="tile__label">art</h2>
+                <div class="photo-slot" aria-label="Art marks">
                     <a class="photo-mark" href="https://github.com/imaad666/kash-repo" target="_blank"
                         rel="noopener noreferrer">
                         <span class="photo-mark__glyph" aria-hidden="true">K</span>
@@ -322,7 +340,7 @@
         </div>
     </main>
 
-    <script src="script.js?v=40" defer></script>
+    <script src="script.js?v=41" defer></script>
 </body>
 
 </html>

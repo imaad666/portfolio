@@ -1,5 +1,27 @@
 (function () {
   const LOGIN = "imaad666";
+
+  // Shared pulse so badges + projects advance together
+  const carouselHub = {
+    controllers: [],
+    timerId: null,
+    period: 4500,
+    register(controller) {
+      this.controllers.push(controller);
+    },
+    next() {
+      this.controllers.forEach((controller) => controller.next?.());
+    },
+    prev() {
+      this.controllers.forEach((controller) => controller.prev?.());
+    },
+    restart() {
+      if (this.timerId) clearInterval(this.timerId);
+      if (this.controllers.length < 1) return;
+      this.timerId = setInterval(() => this.next(), this.period);
+    },
+  };
+
   const LEVELS = [
     null,
     "heatmap-day--l1",
@@ -209,7 +231,6 @@
     });
 
     let active = 0;
-    let timerId = null;
     let dragStartX = 0;
     let dragScrollLeft = 0;
     let dragging = false;
@@ -246,18 +267,18 @@
           best = i;
         }
 
-        const t = px / (width * 0.9);
-        const abs = Math.min(Math.abs(t), 2.5);
-        const ease = 1 - Math.pow(1 - Math.min(abs / 1.35, 1), 2);
-        const scale = 1.18 - ease * 0.34;
-        const lift = (1 - ease) * 0.2;
-        const rotate = Math.max(-9, Math.min(9, t * -4.8));
-        const gray = Math.min(1, ease * 1.05);
-        const opacity = 1 - ease * 0.42;
+        const t = px / (width * 1.05);
+        const abs = Math.min(Math.abs(t), 2.2);
+        const ease = Math.min(abs / 1.15, 1);
+        const scale = 1.1 - ease * 0.2;
+        const lift = (1 - ease) * 0.1;
+        const rotate = Math.max(-3.5, Math.min(3.5, t * -2));
+        const gray = Math.min(1, ease * 1.1);
+        const opacity = 1 - ease * 0.32;
 
         item.style.transform = `translate3d(0, ${-lift}rem, 0) scale(${scale}) rotate(${rotate}deg)`;
-        item.style.filter = `grayscale(${gray}) contrast(${1.04 + (1 - gray) * 0.05})`;
-        item.style.opacity = String(Math.max(0.46, opacity));
+        item.style.filter = `grayscale(${gray}) contrast(${1.03 + (1 - gray) * 0.04})`;
+        item.style.opacity = String(Math.max(0.52, opacity));
         item.style.zIndex = String(Math.round(40 - abs * 10));
       });
 
@@ -275,7 +296,7 @@
       return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
     }
 
-    function animateTo(index, duration = 780) {
+    function animateTo(index, duration = 1100) {
       if (!track || !items[index]) return;
       if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
 
@@ -313,20 +334,6 @@
       scrollAnimId = requestAnimationFrame(step);
     }
 
-    function next() {
-      animateTo((active + 1) % items.length);
-    }
-
-    function prev() {
-      animateTo((active - 1 + items.length) % items.length);
-    }
-
-    function startAuto() {
-      if (timerId) clearInterval(timerId);
-      if (items.length < 2) return;
-      timerId = setInterval(next, 4200);
-    }
-
     items.forEach((item, index) => {
       item.addEventListener("click", (event) => {
         if (didDrag) {
@@ -336,8 +343,8 @@
         }
         if (index !== active) {
           event.preventDefault();
-          animateTo(index, 860);
-          startAuto();
+          animateTo(index, 1200);
+          carouselHub.restart();
         }
       });
     });
@@ -356,11 +363,10 @@
         (event) => {
           if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
             event.preventDefault();
-            track.scrollLeft += event.deltaY * 0.85;
+            track.scrollLeft += event.deltaY * 0.7;
           }
           requestPaint();
-          if (timerId) clearInterval(timerId);
-          startAuto();
+          carouselHub.restart();
         },
         { passive: false }
       );
@@ -377,7 +383,7 @@
         dragStartX = event.clientX;
         dragScrollLeft = track.scrollLeft;
         track.setPointerCapture(event.pointerId);
-        if (timerId) clearInterval(timerId);
+        if (carouselHub.timerId) clearInterval(carouselHub.timerId);
       });
 
       track.addEventListener("pointermove", (event) => {
@@ -392,8 +398,8 @@
         if (!dragging) return;
         dragging = false;
         paint();
-        animateTo(active, 720);
-        startAuto();
+        animateTo(active, 900);
+        carouselHub.restart();
       };
 
       track.addEventListener("pointerup", endDrag);
@@ -402,12 +408,12 @@
       track.addEventListener("keydown", (event) => {
         if (event.key === "ArrowRight") {
           event.preventDefault();
-          next();
-          startAuto();
+          carouselHub.next();
+          carouselHub.restart();
         } else if (event.key === "ArrowLeft") {
           event.preventDefault();
-          prev();
-          startAuto();
+          carouselHub.prev();
+          carouselHub.restart();
         }
       });
     }
@@ -424,7 +430,12 @@
     window.addEventListener("resize", padForCenter);
     requestPaint();
     animateTo(0, 0);
-    startAuto();
+
+    carouselHub.register({
+      next: () => animateTo((active + 1) % items.length, 1100),
+      prev: () => animateTo((active - 1 + items.length) % items.length, 1100),
+    });
+    carouselHub.restart();
   }
 
   async function loadBadges() {
@@ -467,9 +478,9 @@
     if (countEl) countEl.textContent = String(items.length);
 
     let index = 0;
-    let timerId = null;
 
     function setActive(nextIndex) {
+      index = nextIndex;
       items.forEach((item, i) => {
         const active = i === nextIndex;
         item.classList.toggle("is-active", active);
@@ -479,18 +490,11 @@
     }
 
     function next() {
-      index = (index + 1) % items.length;
-      setActive(index);
+      setActive((index + 1) % items.length);
     }
 
     function prev() {
-      index = (index - 1 + items.length) % items.length;
-      setActive(index);
-    }
-
-    function startAutoRotate() {
-      if (timerId) clearInterval(timerId);
-      timerId = setInterval(next, 5000);
+      setActive((index - 1 + items.length) % items.length);
     }
 
     setActive(index);
@@ -503,19 +507,20 @@
 
     if (prevBtn) {
       prevBtn.addEventListener("click", () => {
-        prev();
-        startAutoRotate();
+        carouselHub.prev();
+        carouselHub.restart();
       });
     }
 
     if (nextBtn) {
       nextBtn.addEventListener("click", () => {
-        next();
-        startAutoRotate();
+        carouselHub.next();
+        carouselHub.restart();
       });
     }
 
-    startAutoRotate();
+    carouselHub.register({ next, prev });
+    carouselHub.restart();
   }
 
   document.addEventListener("DOMContentLoaded", initProjectCarousel);
