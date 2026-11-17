@@ -18,9 +18,7 @@
     --stack-max: 58rem;
     --row-gap: clamp(0.85rem, 2.2vh, 1.4rem);
     --col-gap: clamp(1rem, 2.6vw, 1.75rem);
-    --cell-pad: clamp(0.65rem, 1.4vw, 1rem);
-    --cell-bg: rgba(250, 251, 248, 0.42);
-    --cell-radius: 0.85rem;
+    --cell-pad: 0;
     --badge-size: 3.55rem;
     --coverflow-h: 5.75rem;
 }
@@ -193,11 +191,9 @@ body {
     display: flex;
     flex-direction: column;
     padding: var(--cell-pad);
-    background: var(--cell-bg);
-    border-radius: var(--cell-radius);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.55),
-        0 0.5px 0 rgba(20, 24, 22, 0.04);
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
     opacity: 0;
     transform: translateY(0.35rem);
     animation: rise-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -205,9 +201,6 @@ body {
 
 .tile--identity {
     animation-delay: 0.04s;
-    background: transparent;
-    box-shadow: none;
-    padding-left: 0;
 }
 
 .tile--work { animation-delay: 0.1s; }
@@ -743,7 +736,7 @@ a:focus-visible {
         --sheet-pad: 0.55rem;
         --row-gap: 0.7rem;
         --col-gap: 0.7rem;
-        --cell-pad: 0.55rem;
+        --cell-pad: 0;
         --badge-size: 2.85rem;
         --coverflow-h: 4.75rem;
     }
@@ -843,7 +836,7 @@ a:focus-visible {
         --row-gap: 0.55rem;
         --badge-size: 2.6rem;
         --coverflow-h: 4.4rem;
-        --cell-pad: 0.5rem;
+        --cell-pad: 0;
     }
 
     .identity__photo {
