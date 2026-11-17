@@ -265,6 +265,10 @@
       let best = 0;
       let bestDist = Infinity;
 
+      const edgePad = track.clientWidth * 0.14;
+      const viewLeft = track.scrollLeft + edgePad;
+      const viewRight = track.scrollLeft + track.clientWidth - edgePad;
+
       const targets = items.map((item, i) => {
         const width = item.offsetWidth || 1;
         const center = item.offsetLeft + width / 2;
@@ -279,12 +283,21 @@
         const abs = Math.min(Math.abs(t), 2.4);
         // Soft falloff so the focused badge clearly blooms
         const ease = 1 - Math.pow(1 - Math.min(abs / 1.25, 1), 1.65);
+
+        // Hide badges that would only show as half-cut edge scraps
+        let edgeFade = 1;
+        if (center < viewLeft) {
+          edgeFade = Math.max(0, 1 - (viewLeft - center) / (width * 0.7));
+        } else if (center > viewRight) {
+          edgeFade = Math.max(0, 1 - (center - viewRight) / (width * 0.7));
+        }
+
         return {
           scale: 1.22 - ease * 0.44,
           lift: (1 - ease) * 0.2,
           rotate: Math.max(-7, Math.min(7, t * -3.8)),
           gray: Math.min(1, ease * 1.15),
-          opacity: Math.max(0.34, 1 - ease * 0.55),
+          opacity: Math.max(0, (1 - ease * 0.55) * edgeFade),
           z: Math.round(50 - abs * 12),
         };
       });

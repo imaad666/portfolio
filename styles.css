@@ -507,6 +507,21 @@ a:focus-visible {
     /* Extra top room so focused circular badges aren’t clipped */
     padding-top: 0.55rem;
     box-sizing: border-box;
+    /* Kill half-cut badges at the compartment edges */
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 12%,
+        #000 88%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent 0,
+        #000 12%,
+        #000 88%,
+        transparent 100%
+    );
 }
 
 .badge-deck__track::-webkit-scrollbar {
