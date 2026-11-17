@@ -8,16 +8,12 @@
     --muted: #5c6560;
     --link: #141816;
     --accent: #0f6e6a;
-    /* Gray intensity by default; greens bloom on heatmap hover */
+    /* Gray intensity ladder */
     --heat-0: rgba(20, 24, 22, 0.07);
     --heat-1: rgba(20, 24, 22, 0.16);
     --heat-2: rgba(20, 24, 22, 0.28);
     --heat-3: rgba(20, 24, 22, 0.44);
     --heat-4: rgba(20, 24, 22, 0.64);
-    --heat-live-1: #9be9a8;
-    --heat-live-2: #40c463;
-    --heat-live-3: #30a14e;
-    --heat-live-4: #216e39;
     --sheet-pad: clamp(0.65rem, 1.8vw, 1.25rem);
     --stack-max: 58rem;
     --row-gap: clamp(0.85rem, 2.2vh, 1.4rem);
@@ -220,7 +216,14 @@ body {
     animation-delay: 0.2s;
     overflow: visible;
 }
-.tile--projects { animation-delay: 0.26s; }
+.tile--projects {
+    animation-delay: 0.26s;
+    gap: 0.55rem;
+}
+
+.tile--projects .tile__head--tight {
+    margin-bottom: 0.15rem;
+}
 .tile--photos { animation-delay: 0.32s; }
 
 @keyframes rise-in {
@@ -466,33 +469,12 @@ a:focus-visible {
     height: 9px;
     border-radius: 1.5px;
     background: var(--heat-0);
-    transition: background-color 0.35s ease, transform 0.25s ease;
 }
 
 .heatmap-day--l1 { background: var(--heat-1); }
 .heatmap-day--l2 { background: var(--heat-2); }
 .heatmap-day--l3 { background: var(--heat-3); }
 .heatmap-day--l4 { background: var(--heat-4); }
-
-.heatmap-link:hover .heatmap-day--l1,
-.heatmap-link:focus-visible .heatmap-day--l1 {
-    background: var(--heat-live-1);
-}
-
-.heatmap-link:hover .heatmap-day--l2,
-.heatmap-link:focus-visible .heatmap-day--l2 {
-    background: var(--heat-live-2);
-}
-
-.heatmap-link:hover .heatmap-day--l3,
-.heatmap-link:focus-visible .heatmap-day--l3 {
-    background: var(--heat-live-3);
-}
-
-.heatmap-link:hover .heatmap-day--l4,
-.heatmap-link:focus-visible .heatmap-day--l4 {
-    background: var(--heat-live-4);
-}
 
 .heatmap-fallback {
     margin-top: 0.3rem;

@@ -5,7 +5,7 @@
   const carouselHub = {
     controllers: [],
     timerId: null,
-    period: 5200,
+    period: 4600,
     register(controller) {
       this.controllers.push(controller);
     },
@@ -304,7 +304,7 @@
 
       const targets = sampleTargets();
       // Faster while dragging so it tracks the hand; slower otherwise = grace
-      const k = dragging ? 0.42 : syncing ? 0.16 : 0.11;
+      const k = dragging ? 0.5 : syncing ? 0.22 : 0.16;
       let stillMoving = dragging || syncing;
 
       items.forEach((item, i) => {
@@ -344,7 +344,7 @@
       return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
     }
 
-    function animateTo(index, duration = 1400) {
+    function animateTo(index, duration = 980) {
       if (!track || !items[index]) return;
       if (scrollAnimId) cancelAnimationFrame(scrollAnimId);
 
@@ -392,7 +392,7 @@
         }
         if (index !== active) {
           event.preventDefault();
-          animateTo(index, 1500);
+          animateTo(index, 1050);
           carouselHub.restart();
         }
       });
@@ -447,7 +447,7 @@
       const endDrag = () => {
         if (!dragging) return;
         dragging = false;
-        animateTo(active, 1100);
+        animateTo(active, 820);
         carouselHub.restart();
       };
 
@@ -481,8 +481,8 @@
     kick();
 
     carouselHub.register({
-      next: () => animateTo((active + 1) % items.length, 1500),
-      prev: () => animateTo((active - 1 + items.length) % items.length, 1500),
+      next: () => animateTo((active + 1) % items.length, 1050),
+      prev: () => animateTo((active - 1 + items.length) % items.length, 1050),
     });
     carouselHub.restart();
   }
