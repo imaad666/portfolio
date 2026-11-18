@@ -528,13 +528,13 @@
     }
 
     function focusBadge(index) {
+      // Only the colored (centered) badge opens — side ones just come forward
+      if (index !== active) return;
       const badge = badges[index];
       if (!badge) return;
       clearTimeout(resumeTimer);
       auto.block();
       cancelProgrammaticScroll();
-      markActive(index);
-      // Open from the badge’s current spot — don’t wait on scroll
       showFocus(badge, index);
     }
 
@@ -710,6 +710,11 @@
         event.stopPropagation();
         if (didDrag) {
           didDrag = false;
+          return;
+        }
+        if (index !== active) {
+          noteManual();
+          animateTo(index, touchy ? 500 : 900);
           return;
         }
         focusBadge(index);

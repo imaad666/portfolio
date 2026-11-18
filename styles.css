@@ -52,7 +52,7 @@ body {
 }
 
 body.badge-lightbox-active .sheet {
-    filter: blur(5px) saturate(0.94);
+    filter: blur(1.5px) saturate(0.98);
     transition: filter 0.55s ease;
 }
 
@@ -594,9 +594,9 @@ a:focus-visible {
     padding: 0;
     cursor: pointer;
     background:
-        radial-gradient(ellipse 72% 58% at 50% 42%, rgba(40, 38, 34, 0.16), rgba(18, 17, 15, 0.4));
-    -webkit-backdrop-filter: blur(8px) saturate(1.02);
-    backdrop-filter: blur(8px) saturate(1.02);
+        radial-gradient(ellipse 72% 58% at 50% 42%, rgba(40, 38, 34, 0.08), rgba(18, 17, 15, 0.22));
+    -webkit-backdrop-filter: blur(2px) saturate(1.01);
+    backdrop-filter: blur(2px) saturate(1.01);
     opacity: 0;
     transition: opacity 0.45s ease;
 }
