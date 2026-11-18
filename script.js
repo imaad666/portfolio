@@ -350,12 +350,19 @@
       syncing = false;
     }
 
+    function focusOpen() {
+      return Boolean(focusEl && !focusEl.hidden);
+    }
+
     // Manual input wins — stop timed advances until the user goes idle
     function noteManual() {
       auto.block();
       cancelProgrammaticScroll();
       clearTimeout(resumeTimer);
+      // Never resume the carousel while a badge is in focus
+      if (focusOpen()) return;
       resumeTimer = setTimeout(() => {
+        if (focusOpen()) return;
         auto.unblock();
         auto.restart();
       }, 2400);
@@ -363,10 +370,11 @@
 
     function finishHideFocus() {
       focusEl.hidden = true;
-      focusEl.classList.remove("is-open");
+      focusEl.classList.remove("is-open", "is-closing");
       clearArtMotion();
-      items.forEach((item) => item.classList.remove("is-lifted"));
       if (focusImage) {
+        focusImage.style.opacity = "";
+        focusImage.style.filter = "";
         focusImage.removeAttribute("src");
         focusImage.alt = "";
       }
@@ -374,6 +382,7 @@
         focusVisit.removeAttribute("href");
         focusVisit.hidden = true;
       }
+      items.forEach((item) => item.classList.remove("is-lifted"));
       originRect = null;
       closingFocus = false;
       primedIndex = -1;
@@ -386,28 +395,41 @@
       closingFocus = true;
       const source = items[primedIndex];
       const canFlip =
-        !reduceMotion.matches &&
-        focusImage &&
-        originRect &&
-        originRect.width > 0;
+        !reduceMotion.matches && focusImage && source;
 
+      focusEl.classList.add("is-closing");
       focusEl.classList.remove("is-open");
+      // Ease the page blur out with the badge returning home
+      document.body.classList.remove("badge-lightbox-active");
 
       if (!canFlip) {
-        window.setTimeout(finishHideFocus, 280);
+        if (source) source.classList.remove("is-lifted");
+        window.setTimeout(finishHideFocus, 320);
         return;
       }
 
-      const current = focusImage.getBoundingClientRect();
-      const { dx, dy, scale } = artDelta(originRect, current);
-      focusImage.style.transition =
-        "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-      focusImage.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+      requestAnimationFrame(() => {
+        const target = source.getBoundingClientRect();
+        const current = focusImage.getBoundingClientRect();
+        if (!target.width || !current.width) {
+          source.classList.remove("is-lifted");
+          finishHideFocus();
+          return;
+        }
 
-      window.setTimeout(() => {
-        if (source) source.classList.remove("is-lifted");
-        finishHideFocus();
-      }, 400);
+        const { dx, dy, scale } = artDelta(target, current);
+        focusImage.style.transition =
+          "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease, opacity 0.2s ease 0.3s";
+        focusImage.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+        focusImage.style.filter =
+          "drop-shadow(0 0.15rem 0.45rem rgba(12, 11, 9, 0.14))";
+        focusImage.style.opacity = "0";
+
+        window.setTimeout(() => {
+          source.classList.remove("is-lifted");
+          finishHideFocus();
+        }, 520);
+      });
     }
 
     function showFocus(badge, index) {
@@ -456,9 +478,10 @@
       document.body.classList.add("badge-lightbox-active");
       if (source) source.classList.add("is-lifted");
 
-      // Hold auto-advance while the lightbox is open
-      auto.block();
+      // Freeze the coverflow for the whole focus session
       clearTimeout(resumeTimer);
+      auto.block();
+      cancelProgrammaticScroll();
 
       const canFlip =
         !reduceMotion.matches &&
@@ -500,9 +523,9 @@
     function focusBadge(index) {
       const badge = badges[index];
       if (!badge) return;
-      noteManual();
-      auto.block();
       clearTimeout(resumeTimer);
+      auto.block();
+      cancelProgrammaticScroll();
       markActive(index);
       // Open from the badge’s current spot — don’t wait on scroll
       showFocus(badge, index);
@@ -623,7 +646,7 @@
     }
 
     function animateTo(index, duration = 980) {
-      if (!track || !items[index]) return;
+      if (!track || !items[index] || focusOpen()) return;
       cancelProgrammaticScroll();
 
       const end = targetScrollLeft(index);
@@ -796,9 +819,14 @@
     kick();
 
     auto.bind({
-      next: () => animateTo((active + 1) % items.length, touchy ? 600 : 1050),
-      prev: () =>
-        animateTo((active - 1 + items.length) % items.length, touchy ? 600 : 1050),
+      next: () => {
+        if (focusOpen()) return;
+        animateTo((active + 1) % items.length, touchy ? 600 : 1050);
+      },
+      prev: () => {
+        if (focusOpen()) return;
+        animateTo((active - 1 + items.length) % items.length, touchy ? 600 : 1050);
+      },
     });
     auto.restart();
   }
