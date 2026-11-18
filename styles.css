@@ -448,9 +448,12 @@ a:focus-visible {
     flex: 1 1 auto;
     min-height: var(--coverflow-h);
     margin-top: 0.1rem;
-    padding-bottom: 2.45rem;
     background: transparent;
     overflow: visible;
+}
+
+.badge-deck.is-focused {
+    padding-bottom: 2.45rem;
 }
 
 .badge-deck__track {
@@ -585,9 +588,7 @@ a:focus-visible {
 }
 
 .badge-focus[hidden] {
-    display: block;
-    opacity: 0;
-    transform: translateY(0.25rem);
+    display: none;
 }
 
 .badge-focus__name {
@@ -858,7 +859,7 @@ a:focus-visible {
         mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
     }
 
-    .badge-deck {
+    .badge-deck.is-focused {
         padding-bottom: 2.2rem;
     }
 

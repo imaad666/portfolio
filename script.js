@@ -336,7 +336,20 @@
       }, 2400);
     }
 
-    function showFocus(badge, { primed = false } = {}) {
+    function hideFocus() {
+      primedIndex = -1;
+      const deck = document.getElementById("badge-deck");
+      if (deck) deck.classList.remove("is-focused");
+      if (!focusEl) return;
+      focusEl.classList.remove("is-visible");
+      focusEl.hidden = true;
+      if (focusHint) {
+        focusHint.textContent = "";
+        focusHint.hidden = true;
+      }
+    }
+
+    function showFocus(badge, index) {
       if (!focusEl || !focusName || !focusMeta) return;
       const issued = formatBadgeDate(badge.issued);
       const provider =
@@ -347,17 +360,20 @@
             : null;
       const bits = [badge.issuer, issued, provider].filter(Boolean);
 
+      primedIndex = index;
       focusName.textContent = badge.name || "Badge";
       focusMeta.textContent = bits.join(" · ");
       if (focusHint) {
-        focusHint.textContent = primed ? "tap again to open" : "";
-        focusHint.hidden = !primed;
+        focusHint.textContent = "tap again to open";
+        focusHint.hidden = false;
       }
       focusEl.hidden = false;
+      const deck = document.getElementById("badge-deck");
+      if (deck) deck.classList.add("is-focused");
       requestAnimationFrame(() => focusEl.classList.add("is-visible"));
     }
 
-    function markActive(index, { fromTap = false } = {}) {
+    function markActive(index) {
       active = index;
       items.forEach((item, i) => {
         const on = i === index;
@@ -366,14 +382,15 @@
         item.tabIndex = on ? 0 : -1;
       });
 
-      if (fromTap) {
-        primedIndex = index;
-      } else if (!syncing && !programmatic && index !== primedIndex) {
-        primedIndex = -1;
+      // Coverflow stays quiet by default — only a tap opens the focus panel
+      if (
+        primedIndex !== -1 &&
+        index !== primedIndex &&
+        !syncing &&
+        !programmatic
+      ) {
+        hideFocus();
       }
-
-      const badge = badges[index];
-      if (badge) showFocus(badge, { primed: primedIndex === index });
     }
 
     function nearestIndex() {
@@ -490,7 +507,7 @@
       return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
     }
 
-    function animateTo(index, duration = 980, { fromTap = false } = {}) {
+    function animateTo(index, duration = 980) {
       if (!track || !items[index]) return;
       cancelProgrammaticScroll();
 
@@ -501,7 +518,7 @@
       if (duration <= 0 || Math.abs(delta) < 0.5) {
         track.scrollLeft = end;
         syncing = false;
-        markActive(index, { fromTap });
+        markActive(index);
         kick();
         return;
       }
@@ -509,19 +526,18 @@
       // On touch, prefer native smooth scroll so momentum isn’t stolen mid-swipe
       if (touchy) {
         programmatic = true;
-        markActive(index, { fromTap });
+        markActive(index);
         track.scrollTo({ left: end, behavior: "smooth" });
         clearTimeout(progTimer);
         progTimer = setTimeout(() => {
           programmatic = false;
-          markActive(index, { fromTap });
         }, 650);
         kick();
         return;
       }
 
       syncing = true;
-      markActive(index, { fromTap });
+      markActive(index);
       const t0 = performance.now();
       kick();
 
@@ -535,7 +551,7 @@
         } else {
           scrollAnimId = 0;
           syncing = false;
-          markActive(index, { fromTap });
+          markActive(index);
           kick();
         }
       };
@@ -550,19 +566,17 @@
           return;
         }
 
-        // Second tap on the focused badge → open Credly / Accredible
-        if (index === active && primedIndex === index) {
+        // Already focused → open Credly / Accredible
+        if (primedIndex === index) {
           const url = badges[index]?.url || item.dataset.url;
           if (url) window.open(url, "_blank", "noopener,noreferrer");
           return;
         }
 
         noteManual();
-        if (index === active) {
-          markActive(index, { fromTap: true });
-        } else {
-          animateTo(index, touchy ? 500 : 1050, { fromTap: true });
-        }
+        showFocus(badges[index], index);
+        if (index !== active) animateTo(index, touchy ? 500 : 1050);
+        else markActive(index);
       });
     });
 
