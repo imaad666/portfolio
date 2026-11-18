@@ -395,39 +395,46 @@
       closingFocus = true;
       const source = items[primedIndex];
       const canFlip =
-        !reduceMotion.matches && focusImage && source;
+        !reduceMotion.matches &&
+        focusImage &&
+        source &&
+        originRect &&
+        originRect.width > 0;
 
+      // Copy + scrim ease out; keep page blur until the badge lands
       focusEl.classList.add("is-closing");
       focusEl.classList.remove("is-open");
-      // Ease the page blur out with the badge returning home
-      document.body.classList.remove("badge-lightbox-active");
 
       if (!canFlip) {
         if (source) source.classList.remove("is-lifted");
-        window.setTimeout(finishHideFocus, 320);
+        document.body.classList.remove("badge-lightbox-active");
+        window.setTimeout(finishHideFocus, 340);
         return;
       }
 
       requestAnimationFrame(() => {
-        const target = source.getBoundingClientRect();
-        const current = focusImage.getBoundingClientRect();
-        if (!target.width || !current.width) {
-          source.classList.remove("is-lifted");
-          finishHideFocus();
-          return;
-        }
+        // Reset to a clean measured frame at the hero size
+        focusImage.style.transition = "none";
+        focusImage.style.transform = "translate(0px, 0px) scale(1)";
+        focusImage.style.opacity = "1";
+        void focusImage.offsetWidth;
 
-        const { dx, dy, scale } = artDelta(target, current);
+        const current = focusImage.getBoundingClientRect();
+        const { dx, dy, scale } = artDelta(originRect, current);
+
         focusImage.style.transition =
-          "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease, opacity 0.2s ease 0.3s";
+          "transform 0.52s cubic-bezier(0.22, 1, 0.36, 1), filter 0.52s ease";
         focusImage.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
         focusImage.style.filter =
-          "drop-shadow(0 0.15rem 0.45rem rgba(12, 11, 9, 0.14))";
-        focusImage.style.opacity = "0";
+          "drop-shadow(0 0.2rem 0.55rem rgba(12, 11, 9, 0.16))";
 
         window.setTimeout(() => {
-          source.classList.remove("is-lifted");
-          finishHideFocus();
+          // Hand off to the strip badge, then clear the overlay
+          if (source) source.classList.remove("is-lifted");
+          focusImage.style.transition = "opacity 0.14s ease";
+          focusImage.style.opacity = "0";
+          document.body.classList.remove("badge-lightbox-active");
+          window.setTimeout(finishHideFocus, 160);
         }, 520);
       });
     }
