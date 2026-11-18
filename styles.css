@@ -615,19 +615,6 @@ a:focus-visible {
     gap: 1.15rem;
     width: min(22rem, 100%);
     text-align: center;
-    opacity: 0;
-    transform: scale(0.86) translateY(0.85rem);
-    filter: blur(6px);
-    transition:
-        opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-        filter 0.38s ease;
-}
-
-.badge-lightbox.is-open .badge-lightbox__stage {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0);
 }
 
 .badge-lightbox__art {
@@ -636,19 +623,14 @@ a:focus-visible {
     height: auto;
     aspect-ratio: 1;
     object-fit: contain;
+    transform-origin: center center;
+    will-change: transform;
     filter: drop-shadow(0 1.1rem 2.4rem rgba(12, 11, 9, 0.38));
-    animation: badge-lightbox-settle 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes badge-lightbox-settle {
-    from {
-        transform: scale(0.92);
-        opacity: 0.4;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+.badge-deck__item.is-lifted {
+    opacity: 0 !important;
+    pointer-events: none;
 }
 
 .badge-lightbox__copy {
@@ -657,6 +639,16 @@ a:focus-visible {
     align-items: center;
     gap: 0.35rem;
     max-width: 20rem;
+    opacity: 0;
+    transform: translateY(0.55rem);
+    transition:
+        opacity 0.34s ease 0.14s,
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.14s;
+}
+
+.badge-lightbox.is-open .badge-lightbox__copy {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .badge-lightbox__name {
@@ -697,19 +689,18 @@ a:focus-visible {
     body.badge-lightbox-active .sheet,
     body:not(.badge-lightbox-active) .sheet,
     .badge-lightbox__scrim,
-    .badge-lightbox__stage,
+    .badge-lightbox__copy,
     .badge-lightbox__art {
-        transition: none;
-        animation: none;
+        transition: none !important;
+        animation: none !important;
     }
 
     body.badge-lightbox-active .sheet {
         transform: none;
     }
 
-    .badge-lightbox.is-open .badge-lightbox__stage {
+    .badge-lightbox__copy {
         transform: none;
-        filter: none;
     }
 }
 

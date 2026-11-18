@@ -296,6 +296,8 @@
 
     let active = 0;
     let primedIndex = -1;
+    let originRect = null;
+    let closingFocus = false;
     let dragStartX = 0;
     let dragScrollLeft = 0;
     let dragging = false;
@@ -310,6 +312,27 @@
     // Touch: native swipe momentum; desktop: custom drag. Both keep curved lerp.
     const touchy =
       window.matchMedia("(max-width: 720px), (pointer: coarse)").matches;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function clearArtMotion() {
+      if (!focusImage) return;
+      focusImage.style.transition = "";
+      focusImage.style.transform = "";
+    }
+
+    function artDelta(fromRect, toRect) {
+      const dx =
+        fromRect.left +
+        fromRect.width / 2 -
+        (toRect.left + toRect.width / 2);
+      const dy =
+        fromRect.top +
+        fromRect.height / 2 -
+        (toRect.top + toRect.height / 2);
+      const scale =
+        toRect.width > 0 ? fromRect.width / toRect.width : 1;
+      return { dx, dy, scale };
+    }
 
     const visuals = items.map(() => ({
       scale: 0.78,
@@ -338,24 +361,53 @@
       }, 2400);
     }
 
-    function hideFocus() {
-      primedIndex = -1;
-      if (!focusEl || focusEl.hidden) return;
+    function finishHideFocus() {
+      focusEl.hidden = true;
       focusEl.classList.remove("is-open");
-      window.setTimeout(() => {
-        if (focusEl.classList.contains("is-open")) return;
-        focusEl.hidden = true;
-        if (focusImage) {
-          focusImage.removeAttribute("src");
-          focusImage.alt = "";
-        }
-        if (focusVisit) {
-          focusVisit.removeAttribute("href");
-          focusVisit.hidden = true;
-        }
-      }, 280);
+      clearArtMotion();
+      items.forEach((item) => item.classList.remove("is-lifted"));
+      if (focusImage) {
+        focusImage.removeAttribute("src");
+        focusImage.alt = "";
+      }
+      if (focusVisit) {
+        focusVisit.removeAttribute("href");
+        focusVisit.hidden = true;
+      }
+      originRect = null;
+      closingFocus = false;
+      primedIndex = -1;
       document.body.classList.remove("badge-lightbox-active");
       noteManual();
+    }
+
+    function hideFocus() {
+      if (!focusEl || focusEl.hidden || closingFocus) return;
+      closingFocus = true;
+      const source = items[primedIndex];
+      const canFlip =
+        !reduceMotion.matches &&
+        focusImage &&
+        originRect &&
+        originRect.width > 0;
+
+      focusEl.classList.remove("is-open");
+
+      if (!canFlip) {
+        window.setTimeout(finishHideFocus, 280);
+        return;
+      }
+
+      const current = focusImage.getBoundingClientRect();
+      const { dx, dy, scale } = artDelta(originRect, current);
+      focusImage.style.transition =
+        "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+      focusImage.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+
+      window.setTimeout(() => {
+        if (source) source.classList.remove("is-lifted");
+        finishHideFocus();
+      }, 400);
     }
 
     function showFocus(badge, index) {
@@ -368,9 +420,16 @@
             ? "Credly"
             : null;
       const bits = [badge.issuer, provider, issued].filter(Boolean);
+      const source = items[index];
 
+      // Capture origin before the page blurs/scales under the lightbox
+      originRect = source ? source.getBoundingClientRect() : null;
       primedIndex = index;
+      closingFocus = false;
+      items.forEach((item) => item.classList.remove("is-lifted"));
+
       if (focusImage) {
+        clearArtMotion();
         focusImage.src = badge.image;
         focusImage.alt = badge.name || "Badge";
       }
@@ -393,12 +452,39 @@
       }
 
       focusEl.hidden = false;
+      focusEl.classList.remove("is-open");
       document.body.classList.add("badge-lightbox-active");
-      requestAnimationFrame(() => focusEl.classList.add("is-open"));
+      if (source) source.classList.add("is-lifted");
 
       // Hold auto-advance while the lightbox is open
       auto.block();
       clearTimeout(resumeTimer);
+
+      const canFlip =
+        !reduceMotion.matches &&
+        focusImage &&
+        originRect &&
+        originRect.width > 0;
+
+      if (!canFlip) {
+        requestAnimationFrame(() => focusEl.classList.add("is-open"));
+        return;
+      }
+
+      // Place art on the tapped badge, then grow it into the hero slot
+      requestAnimationFrame(() => {
+        const dest = focusImage.getBoundingClientRect();
+        const { dx, dy, scale } = artDelta(originRect, dest);
+        focusImage.style.transition = "none";
+        focusImage.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+        focusEl.classList.add("is-open");
+
+        requestAnimationFrame(() => {
+          focusImage.style.transition =
+            "transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)";
+          focusImage.style.transform = "translate(0px, 0px) scale(1)";
+        });
+      });
     }
 
     function markActive(index) {
@@ -417,8 +503,8 @@
       noteManual();
       auto.block();
       clearTimeout(resumeTimer);
-      if (index !== active) animateTo(index, touchy ? 500 : 900);
-      else markActive(index);
+      markActive(index);
+      // Open from the badge’s current spot — don’t wait on scroll
       showFocus(badge, index);
     }
 
