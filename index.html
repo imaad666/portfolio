@@ -56,7 +56,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=56">
+    <link rel="stylesheet" href="styles.css?v=57">
 </head>
 
 <body>
@@ -150,12 +150,17 @@
                                 rel="noopener noreferrer">accredible</a>
                         </p>
                     </div>
-                <div class="badge-deck" id="badge-deck" aria-label="Badge coverflow">
-                    <div class="badge-deck__track" id="badge-track" tabindex="0" role="listbox"
-                        aria-label="Scrollable badges">
-                        <div class="badge-deck__strip" id="badge-stack" aria-live="polite"></div>
+                    <div class="badge-deck" id="badge-deck" aria-label="Badge coverflow">
+                        <div class="badge-deck__track" id="badge-track" tabindex="0" role="listbox"
+                            aria-label="Scrollable badges">
+                            <div class="badge-deck__strip" id="badge-stack" aria-live="polite"></div>
+                        </div>
+                        <div class="badge-focus" id="badge-focus" hidden>
+                            <p class="badge-focus__name" id="badge-focus-name"></p>
+                            <p class="badge-focus__meta" id="badge-focus-meta"></p>
+                            <p class="badge-focus__hint" id="badge-focus-hint"></p>
+                        </div>
                     </div>
-                </div>
                     <p class="badge-fallback" id="badges-fallback" hidden></p>
                 </section>
             </div>
@@ -325,7 +330,7 @@
         </div>
     </main>
 
-    <script src="script.js?v=56" defer></script>
+    <script src="script.js?v=57" defer></script>
 </body>
 
 </html>

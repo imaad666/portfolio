@@ -448,6 +448,7 @@ a:focus-visible {
     flex: 1 1 auto;
     min-height: var(--coverflow-h);
     margin-top: 0.1rem;
+    padding-bottom: 2.45rem;
     background: transparent;
     overflow: visible;
 }
@@ -519,6 +520,13 @@ a:focus-visible {
     height: var(--badge-size);
     margin-left: calc(var(--badge-size) * -0.42);
     scroll-snap-align: center;
+    border: 0;
+    padding: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
     text-decoration: none;
     transform: translate3d(0, 0, 0) scale(0.78);
     transform-origin: center bottom;
@@ -555,6 +563,54 @@ a:focus-visible {
 
 .badge-deck__item:focus-visible {
     outline: none;
+}
+
+.badge-focus {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.05rem;
+    min-height: 2.2rem;
+    padding-inline: 0.35rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(0.2rem);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+    pointer-events: none;
+}
+
+.badge-focus.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.badge-focus[hidden] {
+    display: block;
+    opacity: 0;
+    transform: translateY(0.25rem);
+}
+
+.badge-focus__name {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 0.95em;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    color: var(--ink);
+}
+
+.badge-focus__meta {
+    margin-top: 0.15rem;
+    font-size: 0.78em;
+    color: var(--muted);
+}
+
+.badge-focus__hint {
+    margin-top: 0.2rem;
+    font-size: 0.68em;
+    font-style: italic;
+    color: var(--muted);
+    opacity: 0.85;
 }
 
 .badge-fallback {
@@ -800,6 +856,14 @@ a:focus-visible {
         /* Fade only the left (older) side — keep latest flush to the right edge */
         -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
         mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
+    }
+
+    .badge-deck {
+        padding-bottom: 2.2rem;
+    }
+
+    .badge-focus__name {
+        font-size: 0.88em;
     }
 
     .badge-deck__track {
