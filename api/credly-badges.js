@@ -35,6 +35,7 @@ module.exports = async function handler(req, res) {
           issued: badge.issued_at_date || null,
           url: `https://www.credly.com/badges/${badge.id}`,
           issuer,
+          source: "credly",
         };
       })
       .filter((badge) => badge.image)
