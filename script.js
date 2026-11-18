@@ -237,10 +237,25 @@
     });
   }
 
+  function formatBadgeDate(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
   function renderBadgeDeck(badges) {
     const stack = document.getElementById("badge-stack");
     const track = document.getElementById("badge-track");
     const fallbackEl = document.getElementById("badges-fallback");
+    const focusEl = document.getElementById("badge-focus");
+    const focusName = document.getElementById("badge-focus-name");
+    const focusMeta = document.getElementById("badge-focus-meta");
+    const focusHint = document.getElementById("badge-focus-hint");
     if (!stack || !fallbackEl) return;
 
     stack.innerHTML = "";
@@ -254,16 +269,15 @@
     fallbackEl.hidden = true;
 
     const items = badges.map((badge, index) => {
-      const link = document.createElement("a");
-      link.className = "badge-deck__item";
-      link.href = badge.url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.title = badge.issuer
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "badge-deck__item";
+      button.title = badge.issuer
         ? `${badge.name} — ${badge.issuer}`
         : badge.name;
-      link.setAttribute("role", "option");
-      link.dataset.index = String(index);
+      button.setAttribute("role", "option");
+      button.dataset.index = String(index);
+      button.dataset.url = badge.url || "";
 
       const img = document.createElement("img");
       img.src = badge.image;
@@ -273,12 +287,13 @@
       // Same settle-in cadence as the heatmap cells
       img.style.animationDelay = `${index * 0.04}s`;
 
-      link.appendChild(img);
-      stack.appendChild(link);
-      return link;
+      button.appendChild(img);
+      stack.appendChild(button);
+      return button;
     });
 
     let active = 0;
+    let primedIndex = -1;
     let dragStartX = 0;
     let dragScrollLeft = 0;
     let dragging = false;
@@ -321,7 +336,28 @@
       }, 2400);
     }
 
-    function markActive(index) {
+    function showFocus(badge, { primed = false } = {}) {
+      if (!focusEl || !focusName || !focusMeta) return;
+      const issued = formatBadgeDate(badge.issued);
+      const provider =
+        badge.source === "accredible"
+          ? "Accredible"
+          : badge.source === "credly"
+            ? "Credly"
+            : null;
+      const bits = [badge.issuer, issued, provider].filter(Boolean);
+
+      focusName.textContent = badge.name || "Badge";
+      focusMeta.textContent = bits.join(" · ");
+      if (focusHint) {
+        focusHint.textContent = primed ? "tap again to open" : "";
+        focusHint.hidden = !primed;
+      }
+      focusEl.hidden = false;
+      requestAnimationFrame(() => focusEl.classList.add("is-visible"));
+    }
+
+    function markActive(index, { fromTap = false } = {}) {
       active = index;
       items.forEach((item, i) => {
         const on = i === index;
@@ -329,6 +365,15 @@
         item.setAttribute("aria-selected", String(on));
         item.tabIndex = on ? 0 : -1;
       });
+
+      if (fromTap) {
+        primedIndex = index;
+      } else if (!syncing && !programmatic && index !== primedIndex) {
+        primedIndex = -1;
+      }
+
+      const badge = badges[index];
+      if (badge) showFocus(badge, { primed: primedIndex === index });
     }
 
     function nearestIndex() {
@@ -445,7 +490,7 @@
       return Math.max(0, item.offsetLeft - (track.clientWidth / 2 - item.offsetWidth / 2));
     }
 
-    function animateTo(index, duration = 980) {
+    function animateTo(index, duration = 980, { fromTap = false } = {}) {
       if (!track || !items[index]) return;
       cancelProgrammaticScroll();
 
@@ -456,7 +501,7 @@
       if (duration <= 0 || Math.abs(delta) < 0.5) {
         track.scrollLeft = end;
         syncing = false;
-        markActive(index);
+        markActive(index, { fromTap });
         kick();
         return;
       }
@@ -464,17 +509,19 @@
       // On touch, prefer native smooth scroll so momentum isn’t stolen mid-swipe
       if (touchy) {
         programmatic = true;
-        markActive(index);
+        markActive(index, { fromTap });
         track.scrollTo({ left: end, behavior: "smooth" });
         clearTimeout(progTimer);
         progTimer = setTimeout(() => {
           programmatic = false;
+          markActive(index, { fromTap });
         }, 650);
         kick();
         return;
       }
 
       syncing = true;
+      markActive(index, { fromTap });
       const t0 = performance.now();
       kick();
 
@@ -488,7 +535,7 @@
         } else {
           scrollAnimId = 0;
           syncing = false;
-          markActive(index);
+          markActive(index, { fromTap });
           kick();
         }
       };
@@ -497,16 +544,24 @@
     }
 
     items.forEach((item, index) => {
-      item.addEventListener("click", (event) => {
+      item.addEventListener("click", () => {
         if (didDrag) {
-          event.preventDefault();
           didDrag = false;
           return;
         }
-        if (index !== active) {
-          event.preventDefault();
-          noteManual();
-          animateTo(index, touchy ? 500 : 1050);
+
+        // Second tap on the focused badge → open Credly / Accredible
+        if (index === active && primedIndex === index) {
+          const url = badges[index]?.url || item.dataset.url;
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+          return;
+        }
+
+        noteManual();
+        if (index === active) {
+          markActive(index, { fromTap: true });
+        } else {
+          animateTo(index, touchy ? 500 : 1050, { fromTap: true });
         }
       });
     });
