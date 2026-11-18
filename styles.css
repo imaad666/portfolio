@@ -452,10 +452,6 @@ a:focus-visible {
     overflow: visible;
 }
 
-.badge-deck.is-focused {
-    padding-bottom: 2.45rem;
-}
-
 .badge-deck__track {
     position: relative;
     height: var(--coverflow-h);
@@ -569,22 +565,10 @@ a:focus-visible {
 }
 
 .badge-focus {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.05rem;
-    min-height: 2.2rem;
-    padding-inline: 0.35rem;
+    margin-top: 0.4rem;
+    padding: 0.35rem 0.45rem 0.45rem;
     text-align: center;
-    opacity: 0;
-    transform: translateY(0.2rem);
-    transition: opacity 0.28s ease, transform 0.28s ease;
-    pointer-events: none;
-}
-
-.badge-focus.is-visible {
-    opacity: 1;
-    transform: translateY(0);
+    border-top: 1px solid rgba(22, 22, 20, 0.1);
 }
 
 .badge-focus[hidden] {
@@ -593,7 +577,7 @@ a:focus-visible {
 
 .badge-focus__name {
     font-family: "Fraunces", Georgia, serif;
-    font-size: 0.95em;
+    font-size: 0.98em;
     font-weight: 600;
     letter-spacing: -0.015em;
     line-height: 1.25;
@@ -601,17 +585,24 @@ a:focus-visible {
 }
 
 .badge-focus__meta {
-    margin-top: 0.15rem;
+    margin-top: 0.18rem;
     font-size: 0.78em;
     color: var(--muted);
 }
 
-.badge-focus__hint {
-    margin-top: 0.2rem;
-    font-size: 0.68em;
-    font-style: italic;
-    color: var(--muted);
-    opacity: 0.85;
+.badge-focus__visit {
+    display: inline-block;
+    margin-top: 0.35rem;
+    font-size: 0.78em;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.badge-focus__visit:hover,
+.badge-focus__visit:focus-visible {
+    color: var(--ink);
 }
 
 .badge-fallback {
@@ -857,10 +848,6 @@ a:focus-visible {
         /* Fade only the left (older) side — keep latest flush to the right edge */
         -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
         mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
-    }
-
-    .badge-deck.is-focused {
-        padding-bottom: 2.2rem;
     }
 
     .badge-focus__name {

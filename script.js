@@ -255,7 +255,7 @@
     const focusEl = document.getElementById("badge-focus");
     const focusName = document.getElementById("badge-focus-name");
     const focusMeta = document.getElementById("badge-focus-meta");
-    const focusHint = document.getElementById("badge-focus-hint");
+    const focusVisit = document.getElementById("badge-focus-visit");
     if (!stack || !fallbackEl) return;
 
     stack.innerHTML = "";
@@ -338,14 +338,10 @@
 
     function hideFocus() {
       primedIndex = -1;
-      const deck = document.getElementById("badge-deck");
-      if (deck) deck.classList.remove("is-focused");
-      if (!focusEl) return;
-      focusEl.classList.remove("is-visible");
-      focusEl.hidden = true;
-      if (focusHint) {
-        focusHint.textContent = "";
-        focusHint.hidden = true;
+      if (focusEl) focusEl.hidden = true;
+      if (focusVisit) {
+        focusVisit.removeAttribute("href");
+        focusVisit.hidden = true;
       }
     }
 
@@ -358,19 +354,31 @@
           : badge.source === "credly"
             ? "Credly"
             : null;
-      const bits = [badge.issuer, issued, provider].filter(Boolean);
+      const bits = [badge.issuer, provider, issued].filter(Boolean);
 
       primedIndex = index;
       focusName.textContent = badge.name || "Badge";
-      focusMeta.textContent = bits.join(" · ");
-      if (focusHint) {
-        focusHint.textContent = "tap again to open";
-        focusHint.hidden = false;
+      focusMeta.textContent = bits.join(" · ") || "Credential";
+      if (focusVisit) {
+        if (badge.url) {
+          focusVisit.href = badge.url;
+          focusVisit.hidden = false;
+          focusVisit.textContent =
+            provider === "Accredible"
+              ? "Visit on Accredible"
+              : provider === "Credly"
+                ? "Visit on Credly"
+                : "Visit";
+        } else {
+          focusVisit.removeAttribute("href");
+          focusVisit.hidden = true;
+        }
       }
       focusEl.hidden = false;
-      const deck = document.getElementById("badge-deck");
-      if (deck) deck.classList.add("is-focused");
-      requestAnimationFrame(() => focusEl.classList.add("is-visible"));
+
+      // Hold auto-advance while the detail panel is open
+      auto.block();
+      clearTimeout(resumeTimer);
     }
 
     function markActive(index) {
@@ -381,16 +389,17 @@
         item.setAttribute("aria-selected", String(on));
         item.tabIndex = on ? 0 : -1;
       });
+    }
 
-      // Coverflow stays quiet by default — only a tap opens the focus panel
-      if (
-        primedIndex !== -1 &&
-        index !== primedIndex &&
-        !syncing &&
-        !programmatic
-      ) {
-        hideFocus();
-      }
+    function focusBadge(index) {
+      const badge = badges[index];
+      if (!badge) return;
+      noteManual();
+      auto.block();
+      clearTimeout(resumeTimer);
+      showFocus(badge, index);
+      if (index !== active) animateTo(index, touchy ? 500 : 900);
+      else markActive(index);
     }
 
     function nearestIndex() {
@@ -560,32 +569,34 @@
     }
 
     items.forEach((item, index) => {
-      item.addEventListener("click", () => {
+      item.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (didDrag) {
           didDrag = false;
           return;
         }
-
-        // Already focused → open Credly / Accredible
-        if (primedIndex === index) {
-          const url = badges[index]?.url || item.dataset.url;
-          if (url) window.open(url, "_blank", "noopener,noreferrer");
-          return;
-        }
-
-        noteManual();
-        showFocus(badges[index], index);
-        if (index !== active) animateTo(index, touchy ? 500 : 1050);
-        else markActive(index);
+        focusBadge(index);
       });
     });
+
+    if (focusVisit) {
+      focusVisit.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+    }
 
     if (track) {
       track.addEventListener(
         "scroll",
         () => {
           // User (or momentum) scrolling — never let auto fight it
-          if (!syncing && !programmatic) noteManual();
+          if (!syncing && !programmatic) {
+            noteManual();
+            if (primedIndex !== -1 && nearestIndex() !== primedIndex) {
+              hideFocus();
+            }
+          }
           kick();
         },
         { passive: true }
@@ -605,8 +616,10 @@
       );
 
       if (!touchy) {
+        // Drag only on empty track — badge buttons keep their clicks
         track.addEventListener("pointerdown", (event) => {
           if (event.pointerType === "mouse" && event.button !== 0) return;
+          if (event.target.closest(".badge-deck__item")) return;
           cancelProgrammaticScroll();
           dragging = true;
           didDrag = false;
@@ -628,7 +641,10 @@
         const endDrag = () => {
           if (!dragging) return;
           dragging = false;
-          animateTo(nearestIndex(), 820);
+          if (didDrag) {
+            animateTo(nearestIndex(), 820);
+            hideFocus();
+          }
           noteManual();
         };
 
