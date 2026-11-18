@@ -252,10 +252,12 @@
     const stack = document.getElementById("badge-stack");
     const track = document.getElementById("badge-track");
     const fallbackEl = document.getElementById("badges-fallback");
-    const focusEl = document.getElementById("badge-focus");
+    const focusEl = document.getElementById("badge-lightbox");
+    const focusImage = document.getElementById("badge-focus-image");
     const focusName = document.getElementById("badge-focus-name");
     const focusMeta = document.getElementById("badge-focus-meta");
     const focusVisit = document.getElementById("badge-focus-visit");
+    const focusClose = document.getElementById("badge-lightbox-close");
     if (!stack || !fallbackEl) return;
 
     stack.innerHTML = "";
@@ -338,11 +340,22 @@
 
     function hideFocus() {
       primedIndex = -1;
-      if (focusEl) focusEl.hidden = true;
-      if (focusVisit) {
-        focusVisit.removeAttribute("href");
-        focusVisit.hidden = true;
-      }
+      if (!focusEl || focusEl.hidden) return;
+      focusEl.classList.remove("is-open");
+      window.setTimeout(() => {
+        if (focusEl.classList.contains("is-open")) return;
+        focusEl.hidden = true;
+        if (focusImage) {
+          focusImage.removeAttribute("src");
+          focusImage.alt = "";
+        }
+        if (focusVisit) {
+          focusVisit.removeAttribute("href");
+          focusVisit.hidden = true;
+        }
+      }, 280);
+      document.body.classList.remove("badge-lightbox-active");
+      noteManual();
     }
 
     function showFocus(badge, index) {
@@ -357,6 +370,10 @@
       const bits = [badge.issuer, provider, issued].filter(Boolean);
 
       primedIndex = index;
+      if (focusImage) {
+        focusImage.src = badge.image;
+        focusImage.alt = badge.name || "Badge";
+      }
       focusName.textContent = badge.name || "Badge";
       focusMeta.textContent = bits.join(" · ") || "Credential";
       if (focusVisit) {
@@ -374,9 +391,12 @@
           focusVisit.hidden = true;
         }
       }
-      focusEl.hidden = false;
 
-      // Hold auto-advance while the detail panel is open
+      focusEl.hidden = false;
+      document.body.classList.add("badge-lightbox-active");
+      requestAnimationFrame(() => focusEl.classList.add("is-open"));
+
+      // Hold auto-advance while the lightbox is open
       auto.block();
       clearTimeout(resumeTimer);
     }
@@ -397,9 +417,9 @@
       noteManual();
       auto.block();
       clearTimeout(resumeTimer);
-      showFocus(badge, index);
       if (index !== active) animateTo(index, touchy ? 500 : 900);
       else markActive(index);
+      showFocus(badge, index);
     }
 
     function nearestIndex() {
@@ -580,23 +600,29 @@
       });
     });
 
+    if (focusClose) {
+      focusClose.addEventListener("click", () => hideFocus());
+    }
+
     if (focusVisit) {
       focusVisit.addEventListener("click", (event) => {
         event.stopPropagation();
       });
     }
 
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && primedIndex !== -1) {
+        event.preventDefault();
+        hideFocus();
+      }
+    });
+
     if (track) {
       track.addEventListener(
         "scroll",
         () => {
           // User (or momentum) scrolling — never let auto fight it
-          if (!syncing && !programmatic) {
-            noteManual();
-            if (primedIndex !== -1 && nearestIndex() !== primedIndex) {
-              hideFocus();
-            }
-          }
+          if (!syncing && !programmatic) noteManual();
           kick();
         },
         { passive: true }
@@ -641,10 +667,7 @@
         const endDrag = () => {
           if (!dragging) return;
           dragging = false;
-          if (didDrag) {
-            animateTo(nearestIndex(), 820);
-            hideFocus();
-          }
+          if (didDrag) animateTo(nearestIndex(), 820);
           noteManual();
         };
 

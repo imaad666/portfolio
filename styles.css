@@ -51,6 +51,16 @@ body {
     text-rendering: optimizeLegibility;
 }
 
+body.badge-lightbox-active .sheet {
+    filter: blur(10px) saturate(0.85);
+    transform: scale(1.02);
+    transition: filter 0.35s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body:not(.badge-lightbox-active) .sheet {
+    transition: filter 0.28s ease, transform 0.28s ease;
+}
+
 /* —— Atmosphere (awwwards-ish texture) —— */
 .stage {
     position: fixed;
@@ -564,45 +574,143 @@ a:focus-visible {
     outline: none;
 }
 
-.badge-focus {
-    margin-top: 0.4rem;
-    padding: 0.35rem 0.45rem 0.45rem;
-    text-align: center;
-    border-top: 1px solid rgba(22, 22, 20, 0.1);
+/* —— Badge lightbox (photo-app style focus) —— */
+.badge-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: max(1rem, env(safe-area-inset-top)) 1.15rem max(1.15rem, env(safe-area-inset-bottom));
 }
 
-.badge-focus[hidden] {
+.badge-lightbox[hidden] {
     display: none;
 }
 
-.badge-focus__name {
+.badge-lightbox__scrim {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    background:
+        radial-gradient(ellipse 70% 55% at 50% 42%, rgba(40, 38, 34, 0.28), rgba(18, 17, 15, 0.62));
+    -webkit-backdrop-filter: blur(18px) saturate(1.05);
+    backdrop-filter: blur(18px) saturate(1.05);
+    opacity: 0;
+    transition: opacity 0.32s ease;
+}
+
+.badge-lightbox.is-open .badge-lightbox__scrim {
+    opacity: 1;
+}
+
+.badge-lightbox__stage {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.15rem;
+    width: min(22rem, 100%);
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.86) translateY(0.85rem);
+    filter: blur(6px);
+    transition:
+        opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.38s ease;
+}
+
+.badge-lightbox.is-open .badge-lightbox__stage {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+}
+
+.badge-lightbox__art {
+    display: block;
+    width: min(15.5rem, 62vw);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    filter: drop-shadow(0 1.1rem 2.4rem rgba(12, 11, 9, 0.38));
+    animation: badge-lightbox-settle 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes badge-lightbox-settle {
+    from {
+        transform: scale(0.92);
+        opacity: 0.4;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.badge-lightbox__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    max-width: 20rem;
+}
+
+.badge-lightbox__name {
     font-family: "Fraunces", Georgia, serif;
-    font-size: 0.98em;
+    font-size: clamp(1.15rem, 1rem + 1.4vw, 1.55rem);
     font-weight: 600;
-    letter-spacing: -0.015em;
-    line-height: 1.25;
-    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: #f4f2ee;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
 }
 
-.badge-focus__meta {
-    margin-top: 0.18rem;
-    font-size: 0.78em;
-    color: var(--muted);
+.badge-lightbox__meta {
+    font-size: 0.86em;
+    color: rgba(244, 242, 238, 0.72);
 }
 
-.badge-focus__visit {
-    display: inline-block;
-    margin-top: 0.35rem;
-    font-size: 0.78em;
+.badge-lightbox__visit {
+    margin-top: 0.45rem;
+    font-size: 0.9em;
     font-weight: 500;
-    color: var(--accent);
+    color: #f4f2ee;
     text-decoration: underline;
-    text-underline-offset: 0.15em;
+    text-underline-offset: 0.18em;
+    text-decoration-color: rgba(244, 242, 238, 0.45);
 }
 
-.badge-focus__visit:hover,
-.badge-focus__visit:focus-visible {
-    color: var(--ink);
+.badge-lightbox__visit:hover,
+.badge-lightbox__visit:focus-visible {
+    text-decoration-color: #f4f2ee;
+}
+
+.badge-lightbox__visit[hidden] {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.badge-lightbox-active .sheet,
+    body:not(.badge-lightbox-active) .sheet,
+    .badge-lightbox__scrim,
+    .badge-lightbox__stage,
+    .badge-lightbox__art {
+        transition: none;
+        animation: none;
+    }
+
+    body.badge-lightbox-active .sheet {
+        transform: none;
+    }
+
+    .badge-lightbox.is-open .badge-lightbox__stage {
+        transform: none;
+        filter: none;
+    }
 }
 
 .badge-fallback {
@@ -850,8 +958,8 @@ a:focus-visible {
         mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 100%);
     }
 
-    .badge-focus__name {
-        font-size: 0.88em;
+    .badge-lightbox__art {
+        width: min(13.5rem, 68vw);
     }
 
     .badge-deck__track {

@@ -56,7 +56,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=59">
+    <link rel="stylesheet" href="styles.css?v=60">
 </head>
 
 <body>
@@ -154,12 +154,6 @@
                         <div class="badge-deck__track" id="badge-track" tabindex="0" role="listbox"
                             aria-label="Scrollable badges">
                             <div class="badge-deck__strip" id="badge-stack" aria-live="polite"></div>
-                        </div>
-                        <div class="badge-focus" id="badge-focus" hidden>
-                            <p class="badge-focus__name" id="badge-focus-name"></p>
-                            <p class="badge-focus__meta" id="badge-focus-meta"></p>
-                            <a class="badge-focus__visit" id="badge-focus-visit" href="#" target="_blank"
-                                rel="noopener noreferrer">Visit</a>
                         </div>
                     </div>
                     <p class="badge-fallback" id="badges-fallback" hidden></p>
@@ -331,7 +325,20 @@
         </div>
     </main>
 
-    <script src="script.js?v=59" defer></script>
+    <div class="badge-lightbox" id="badge-lightbox" hidden>
+        <button type="button" class="badge-lightbox__scrim" id="badge-lightbox-close" aria-label="Close badge"></button>
+        <div class="badge-lightbox__stage" role="dialog" aria-modal="true" aria-labelledby="badge-focus-name">
+            <img class="badge-lightbox__art" id="badge-focus-image" alt="" width="280" height="280">
+            <div class="badge-lightbox__copy">
+                <p class="badge-lightbox__name" id="badge-focus-name"></p>
+                <p class="badge-lightbox__meta" id="badge-focus-meta"></p>
+                <a class="badge-lightbox__visit" id="badge-focus-visit" href="#" target="_blank"
+                    rel="noopener noreferrer">Visit</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=60" defer></script>
 </body>
 
 </html>
