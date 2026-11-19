@@ -258,6 +258,8 @@
     const focusMeta = document.getElementById("badge-focus-meta");
     const focusVisit = document.getElementById("badge-focus-visit");
     const focusClose = document.getElementById("badge-lightbox-close");
+    const focusPrev = document.getElementById("badge-lightbox-prev");
+    const focusNext = document.getElementById("badge-lightbox-next");
     if (!stack || !fallbackEl) return;
 
     stack.innerHTML = "";
@@ -298,6 +300,8 @@
     let primedIndex = -1;
     let originRect = null;
     let closingFocus = false;
+    let shiftingFocus = false;
+    let focusSwipeX = null;
     let dragStartX = 0;
     let dragScrollLeft = 0;
     let dragging = false;
@@ -439,8 +443,8 @@
       });
     }
 
-    function showFocus(badge, index) {
-      if (!focusEl || !focusName || !focusMeta) return;
+    function fillFocusContent(badge) {
+      if (!focusName || !focusMeta) return;
       const issued = formatBadgeDate(badge.issued);
       const provider =
         badge.source === "accredible"
@@ -449,16 +453,8 @@
             ? "Credly"
             : null;
       const bits = [badge.issuer, provider, issued].filter(Boolean);
-      const source = items[index];
-
-      // Capture origin before the page blurs/scales under the lightbox
-      originRect = source ? source.getBoundingClientRect() : null;
-      primedIndex = index;
-      closingFocus = false;
-      items.forEach((item) => item.classList.remove("is-lifted"));
 
       if (focusImage) {
-        clearArtMotion();
         focusImage.src = badge.image;
         focusImage.alt = badge.name || "Badge";
       }
@@ -479,9 +475,36 @@
           focusVisit.hidden = true;
         }
       }
+    }
+
+    function syncDeckQuiet(index) {
+      markActive(index);
+      items.forEach((item, i) => {
+        item.classList.toggle("is-lifted", i === index);
+      });
+      if (track && items[index]) {
+        track.scrollLeft = targetScrollLeft(index);
+        kick();
+      }
+      originRect = items[index] ? items[index].getBoundingClientRect() : null;
+    }
+
+    function showFocus(badge, index) {
+      if (!focusEl || !focusName || !focusMeta) return;
+      const source = items[index];
+
+      // Capture origin before the page softens under the lightbox
+      originRect = source ? source.getBoundingClientRect() : null;
+      primedIndex = index;
+      closingFocus = false;
+      shiftingFocus = false;
+      items.forEach((item) => item.classList.remove("is-lifted"));
+
+      if (focusImage) clearArtMotion();
+      fillFocusContent(badge);
 
       focusEl.hidden = false;
-      focusEl.classList.remove("is-open");
+      focusEl.classList.remove("is-open", "is-closing");
       document.body.classList.add("badge-lightbox-active");
       if (source) source.classList.add("is-lifted");
 
@@ -515,6 +538,58 @@
           focusImage.style.transform = "translate(0px, 0px) scale(1)";
         });
       });
+    }
+
+    function shiftFocus(delta) {
+      if (!focusOpen() || closingFocus || shiftingFocus || badges.length < 2) {
+        return;
+      }
+      const next =
+        (primedIndex + delta + badges.length) % badges.length;
+      const dir = delta > 0 ? 1 : -1;
+      const badge = badges[next];
+      if (!badge) return;
+
+      shiftingFocus = true;
+      clearTimeout(resumeTimer);
+      auto.block();
+
+      const slideOut = () => {
+        primedIndex = next;
+        fillFocusContent(badge);
+        syncDeckQuiet(next);
+
+        if (reduceMotion.matches || !focusImage) {
+          shiftingFocus = false;
+          return;
+        }
+
+        focusImage.style.transition = "none";
+        focusImage.style.transform = `translate(${dir * 36}px, 0) scale(0.97)`;
+        focusImage.style.opacity = "0";
+        void focusImage.offsetWidth;
+        requestAnimationFrame(() => {
+          focusImage.style.transition =
+            "transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease";
+          focusImage.style.transform = "translate(0px, 0px) scale(1)";
+          focusImage.style.opacity = "1";
+          window.setTimeout(() => {
+            shiftingFocus = false;
+            clearArtMotion();
+          }, 320);
+        });
+      };
+
+      if (reduceMotion.matches || !focusImage) {
+        slideOut();
+        return;
+      }
+
+      focusImage.style.transition =
+        "transform 0.22s ease, opacity 0.2s ease";
+      focusImage.style.transform = `translate(${dir * -28}px, 0) scale(0.97)`;
+      focusImage.style.opacity = "0";
+      window.setTimeout(slideOut, 200);
     }
 
     function markActive(index) {
@@ -725,16 +800,67 @@
       focusClose.addEventListener("click", () => hideFocus());
     }
 
+    if (focusPrev) {
+      focusPrev.addEventListener("click", (event) => {
+        event.stopPropagation();
+        shiftFocus(-1);
+      });
+    }
+
+    if (focusNext) {
+      focusNext.addEventListener("click", (event) => {
+        event.stopPropagation();
+        shiftFocus(1);
+      });
+    }
+
     if (focusVisit) {
       focusVisit.addEventListener("click", (event) => {
         event.stopPropagation();
       });
     }
 
+    if (focusEl) {
+      focusEl.addEventListener("pointerdown", (event) => {
+        if (
+          event.target.closest(
+            "a, .badge-lightbox__nav, .badge-lightbox__scrim"
+          )
+        ) {
+          focusSwipeX = null;
+          return;
+        }
+        focusSwipeX = event.clientX;
+      });
+
+      focusEl.addEventListener("pointerup", (event) => {
+        if (focusSwipeX == null) return;
+        const dx = event.clientX - focusSwipeX;
+        focusSwipeX = null;
+        if (Math.abs(dx) < 48) return;
+        shiftFocus(dx < 0 ? 1 : -1);
+      });
+
+      focusEl.addEventListener("pointercancel", () => {
+        focusSwipeX = null;
+      });
+    }
+
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && primedIndex !== -1) {
+      if (!focusOpen() || closingFocus) return;
+      if (event.key === "Escape") {
         event.preventDefault();
         hideFocus();
+        return;
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        shiftFocus(1);
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        shiftFocus(-1);
       }
     });
 

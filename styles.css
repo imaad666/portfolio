@@ -610,6 +610,41 @@ a:focus-visible {
     transition: opacity 0.55s ease 0.08s;
 }
 
+.badge-lightbox__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    translate: 0 -50%;
+    width: 2.6rem;
+    height: 2.6rem;
+    border: 0;
+    padding: 0;
+    border-radius: 999px;
+    background: rgba(244, 242, 238, 0.1);
+    color: rgba(244, 242, 238, 0.88);
+    font-size: 1.65rem;
+    line-height: 1;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.badge-lightbox__nav:hover,
+.badge-lightbox__nav:focus-visible {
+    background: rgba(244, 242, 238, 0.2);
+    color: #f4f2ee;
+    outline: none;
+}
+
+.badge-lightbox__nav--prev {
+    left: max(0.45rem, env(safe-area-inset-left));
+}
+
+.badge-lightbox__nav--next {
+    right: max(0.45rem, env(safe-area-inset-right));
+}
+
 .badge-lightbox__stage {
     position: relative;
     z-index: 1;
@@ -619,6 +654,7 @@ a:focus-visible {
     gap: 1.15rem;
     width: min(22rem, 100%);
     text-align: center;
+    touch-action: pan-y;
 }
 
 .badge-lightbox__art {
@@ -960,6 +996,12 @@ a:focus-visible {
 
     .badge-lightbox__art {
         width: min(13.5rem, 68vw);
+    }
+
+    .badge-lightbox__nav {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: 1.45rem;
     }
 
     .badge-deck__track {
