@@ -256,11 +256,16 @@ body:not(.badge-lightbox-active) .sheet {
     align-items: center;
     gap: 0.28rem;
     color: var(--link);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.social span {
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.18em;
     text-decoration-color: rgba(20, 24, 22, 0.28);
-    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+    transition: text-decoration-color 0.2s ease;
 }
 
 .social svg {
@@ -269,13 +274,19 @@ body:not(.badge-lightbox-active) .sheet {
     height: 0.68rem;
     flex-shrink: 0;
     opacity: 0.85;
+    /* Sit with the label underline instead of floating above it */
+    transform: translateY(0.14em);
 }
 
 .social:hover,
 .social:focus-visible {
     color: var(--accent);
-    text-decoration-color: var(--accent);
     outline: none;
+}
+
+.social:hover span,
+.social:focus-visible span {
+    text-decoration-color: var(--accent);
 }
 
 .dot {
