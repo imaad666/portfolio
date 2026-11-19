@@ -275,7 +275,7 @@ body:not(.badge-lightbox-active) .sheet {
     flex-shrink: 0;
     opacity: 0.85;
     /* Sit with the label underline instead of floating above it */
-    transform: translateY(0.14em);
+    transform: translateY(0.06em);
 }
 
 .social:hover,
