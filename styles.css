@@ -570,7 +570,7 @@ a:focus-visible {
     opacity: 0;
     transform: scale(0.55);
     transform-origin: center bottom;
-    animation: badge-settle 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: badge-settle 0.35s ease forwards;
 }
 
 @keyframes badge-settle {
@@ -622,6 +622,7 @@ a:focus-visible {
 }
 
 .badge-lightbox__nav {
+    display: none;
     position: absolute;
     top: 50%;
     z-index: 2;
@@ -666,6 +667,24 @@ a:focus-visible {
     width: min(22rem, 100%);
     text-align: center;
     touch-action: pan-y;
+    opacity: 0;
+    transform: scale(0.92);
+    transition:
+        opacity 0.35s ease,
+        transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.badge-lightbox.is-open .badge-lightbox__stage {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.badge-lightbox.is-closing .badge-lightbox__stage {
+    opacity: 0;
+    transform: scale(0.94);
+    transition:
+        opacity 0.28s ease,
+        transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .badge-lightbox__art {
@@ -749,13 +768,16 @@ a:focus-visible {
     body.badge-lightbox-active .sheet,
     body:not(.badge-lightbox-active) .sheet,
     .badge-lightbox__scrim,
+    .badge-lightbox__stage,
     .badge-lightbox__copy,
     .badge-lightbox__art {
         transition: none !important;
         animation: none !important;
     }
 
+    .badge-lightbox__stage,
     .badge-lightbox__copy {
+        opacity: 1;
         transform: none;
     }
 }
@@ -1007,12 +1029,6 @@ a:focus-visible {
 
     .badge-lightbox__art {
         width: min(13.5rem, 68vw);
-    }
-
-    .badge-lightbox__nav {
-        width: 2.25rem;
-        height: 2.25rem;
-        font-size: 1.45rem;
     }
 
     .badge-deck__track {
