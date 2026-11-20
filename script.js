@@ -384,48 +384,63 @@
       if (!focusEl || focusEl.hidden || closingFocus) return;
       closingFocus = true;
       const source = items[primedIndex];
-      const canFlip =
-        !reduceMotion.matches &&
-        focusImage &&
-        source &&
-        originRect &&
-        originRect.width > 0;
+      let landed = false;
 
-      // Copy + scrim ease out; keep page blur until the badge lands
+      // Copy + scrim ease out; stage stays put so the art can fly home
       focusEl.classList.add("is-closing");
       focusEl.classList.remove("is-open");
 
-      if (!canFlip) {
+      const land = () => {
+        if (landed) return;
+        landed = true;
         if (source) source.classList.remove("is-lifted");
+        if (focusImage) {
+          focusImage.style.transition = "opacity 0.12s ease";
+          focusImage.style.opacity = "0";
+        }
         document.body.classList.remove("badge-lightbox-active");
-        window.setTimeout(finishHideFocus, 340);
+        window.setTimeout(finishHideFocus, 140);
+      };
+
+      const canFlip =
+        !reduceMotion.matches && focusImage && source;
+
+      if (!canFlip) {
+        land();
         return;
       }
 
       requestAnimationFrame(() => {
-        // Reset to a clean measured frame at the hero size
+        // Fresh landing target from the strip badge (includes coverflow transform)
+        const target = source.getBoundingClientRect();
         focusImage.style.transition = "none";
         focusImage.style.transform = "translate(0px, 0px) scale(1)";
         focusImage.style.opacity = "1";
+        focusImage.style.filter =
+          "drop-shadow(0 1.1rem 2.4rem rgba(12, 11, 9, 0.38))";
         void focusImage.offsetWidth;
 
         const current = focusImage.getBoundingClientRect();
-        const { dx, dy, scale } = artDelta(originRect, current);
+        if (!target.width || !current.width) {
+          land();
+          return;
+        }
 
+        const { dx, dy, scale } = artDelta(target, current);
+        const onEnd = (event) => {
+          if (event.propertyName && event.propertyName !== "transform") return;
+          focusImage.removeEventListener("transitionend", onEnd);
+          land();
+        };
+
+        focusImage.addEventListener("transitionend", onEnd);
         focusImage.style.transition =
-          "transform 0.52s cubic-bezier(0.22, 1, 0.36, 1), filter 0.52s ease";
+          "transform 0.48s cubic-bezier(0.22, 1, 0.36, 1), filter 0.48s ease";
         focusImage.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
         focusImage.style.filter =
-          "drop-shadow(0 0.2rem 0.55rem rgba(12, 11, 9, 0.16))";
+          "drop-shadow(0 0.15rem 0.4rem rgba(12, 11, 9, 0.12))";
 
-        window.setTimeout(() => {
-          // Hand off to the strip badge, then clear the overlay
-          if (source) source.classList.remove("is-lifted");
-          focusImage.style.transition = "opacity 0.14s ease";
-          focusImage.style.opacity = "0";
-          document.body.classList.remove("badge-lightbox-active");
-          window.setTimeout(finishHideFocus, 160);
-        }, 520);
+        window.setTimeout(land, 520);
       });
     }
 
