@@ -275,8 +275,7 @@
       img.alt = badge.name;
       img.loading = index < 10 ? "eager" : "lazy";
       img.draggable = false;
-      // Same settle-in cadence as the heatmap cells
-      img.style.animationDelay = `${index * 0.04}s`;
+      img.style.animationDelay = `${index * 0.018}s`;
 
       button.appendChild(img);
       stack.appendChild(button);
