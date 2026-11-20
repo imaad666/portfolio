@@ -1,0 +1,46 @@
+name: Sync Badges
+
+on:
+  schedule:
+    - cron: '0 */8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch badges
+        id: fetch
+        env:
+          CREDLY_USERNAME: ${{ vars.CREDLY_USERNAME || 'imaad' }}
+          ACCREDIBLE_USERNAME: ${{ vars.ACCREDIBLE_USERNAME || 'imaadirshad800668' }}
+        run: node scripts/fetch-badges.js
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet assets/badges/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/badges/
+          git commit -m "chore: sync badges from Credly and Accredible"
+          git push

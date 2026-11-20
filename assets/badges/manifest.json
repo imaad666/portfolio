@@ -1,0 +1,327 @@
+{
+  "lastUpdated": "2026-11-20T13:35:59.264Z",
+  "count": 35,
+  "badges": [
+    {
+      "id": "credly-02d34857-5048-430f-a1e0-d2b21d7ce9e0",
+      "name": "Claude Certified Architect - Foundations",
+      "issued": "2026-11-18",
+      "url": "https://www.credly.com/badges/02d34857-5048-430f-a1e0-d2b21d7ce9e0",
+      "issuer": "Anthropic",
+      "source": "credly",
+      "image": "assets/badges/credly-claude-certified-architect-foundations.png"
+    },
+    {
+      "id": "credly-b190a049-5e37-46a0-b049-4dc069287fb5",
+      "name": "Claude Certified Associate - Foundations",
+      "issued": "2026-11-17",
+      "url": "https://www.credly.com/badges/b190a049-5e37-46a0-b049-4dc069287fb5",
+      "issuer": "Anthropic",
+      "source": "credly",
+      "image": "assets/badges/credly-claude-certified-associate-foundations.png"
+    },
+    {
+      "id": "accredible-f70fe29d-92b8-4533-9dc2-a0dfba272180",
+      "name": "OpenAI Technical Practitioner",
+      "issued": "2026-11-16",
+      "url": "https://oaipartnernetwork.credential.net/f70fe29d-92b8-4533-9dc2-a0dfba272180",
+      "issuer": "OpenAI Partner Network",
+      "source": "accredible",
+      "kind": "badge",
+      "image": "assets/badges/accredible-openai-technical-practitioner.png"
+    },
+    {
+      "id": "accredible-3ca28234-c3e3-4f33-89f4-bb6eab75913e",
+      "name": "OpenAI Cyber Deployment Practitioner",
+      "issued": "2026-11-16",
+      "url": "https://oaipartnernetwork.credential.net/3ca28234-c3e3-4f33-89f4-bb6eab75913e",
+      "issuer": "OpenAI Partner Network",
+      "source": "accredible",
+      "kind": "badge",
+      "image": "assets/badges/accredible-openai-cyber-deployment-practitioner.png"
+    },
+    {
+      "id": "accredible-7ae7c17b-cbfe-4dac-bf91-3d42633bcadf",
+      "name": "OpenAI Consultative Solutions Practitioner",
+      "issued": "2026-10-07",
+      "url": "https://oaipartnernetwork.credential.net/7ae7c17b-cbfe-4dac-bf91-3d42633bcadf",
+      "issuer": "OpenAI Partner Network",
+      "source": "accredible",
+      "kind": "badge",
+      "image": "assets/badges/accredible-openai-consultative-solutions-practitioner.png"
+    },
+    {
+      "id": "credly-d9b3235e-d449-4c49-aabc-fb2c3863e8a6",
+      "name": "Build a Secure Google Cloud Network Skill Badge",
+      "issued": "2026-09-15",
+      "url": "https://www.credly.com/badges/d9b3235e-d449-4c49-aabc-fb2c3863e8a6",
+      "issuer": "Google Cloud",
+      "source": "credly",
+      "image": "assets/badges/credly-build-a-secure-google-cloud-network-skill-badge.png"
+    },
+    {
+      "id": "credly-73426ebc-a952-4b5e-8cf6-9def664f0a61",
+      "name": "Implement Load Balancing on Compute Engine Skill Badge",
+      "issued": "2026-09-15",
+      "url": "https://www.credly.com/badges/73426ebc-a952-4b5e-8cf6-9def664f0a61",
+      "issuer": "Google Cloud",
+      "source": "credly",
+      "image": "assets/badges/credly-implement-load-balancing-on-compute-engine-skill-b.png"
+    },
+    {
+      "id": "credly-5b6ec0bc-3db6-4ccd-8779-0953f0207e89",
+      "name": "Prepare Data for ML APIs on Google Cloud Skill Badge",
+      "issued": "2026-09-15",
+      "url": "https://www.credly.com/badges/5b6ec0bc-3db6-4ccd-8779-0953f0207e89",
+      "issuer": "Google Cloud",
+      "source": "credly",
+      "image": "assets/badges/credly-prepare-data-for-ml-apis-on-google-cloud-skill-bad.png"
+    },
+    {
+      "id": "credly-cc3e3e72-8d94-4250-9107-556cf7ef14a9",
+      "name": "Set Up an App Dev Environment on Google Cloud Skill Badge",
+      "issued": "2026-09-15",
+      "url": "https://www.credly.com/badges/cc3e3e72-8d94-4250-9107-556cf7ef14a9",
+      "issuer": "Google Cloud",
+      "source": "credly",
+      "image": "assets/badges/credly-set-up-an-app-dev-environment-on-google-cloud-skil.png"
+    },
+    {
+      "id": "accredible-30e5998b-0ad8-445c-a0a6-3b426cb72967",
+      "name": "Codex Solutions Practitioner",
+      "issued": "2026-09-10",
+      "url": "https://oaipartnernetwork.credential.net/30e5998b-0ad8-445c-a0a6-3b426cb72967",
+      "issuer": "OpenAI Partner Network",
+      "source": "accredible",
+      "kind": "badge",
+      "image": "assets/badges/accredible-codex-solutions-practitioner.png"
+    },
+    {
+      "id": "credly-2a75eb45-cb4c-4e8f-a3a4-31ecafd6d6d1",
+      "name": "Claude Partner Badge - Claude Code",
+      "issued": "2026-08-28",
+      "url": "https://www.credly.com/badges/2a75eb45-cb4c-4e8f-a3a4-31ecafd6d6d1",
+      "issuer": "Anthropic",
+      "source": "credly",
+      "image": "assets/badges/credly-claude-partner-badge-claude-code.png"
+    },
+    {
+      "id": "accredible-cdf1d8e8-8f8c-4bbc-abaf-d821ee3c2e8c",
+      "name": "OpenAI Foundational Knowledge",
+      "issued": "2026-08-28",
+      "url": "https://oaipartnernetwork.credential.net/cdf1d8e8-8f8c-4bbc-abaf-d821ee3c2e8c",
+      "issuer": "OpenAI Partner Network",
+      "source": "accredible",
+      "kind": "badge",
+      "image": "assets/badges/accredible-openai-foundational-knowledge.png"
+    },
+    {
+      "id": "credly-86798c74-f59d-4e60-91fc-c8fde58b2c99",
+      "name": "Claude Certified Developer - Foundations",
+      "issued": "2026-08-13",
+      "url": "https://www.credly.com/badges/86798c74-f59d-4e60-91fc-c8fde58b2c99",
+      "issuer": "Anthropic",
+      "source": "credly",
+      "image": "assets/badges/credly-claude-certified-developer-foundations.png"
+    },
+    {
+      "id": "credly-42080af4-364f-4dd9-95da-b77fb399f873",
+      "name": "IBM i Ready",
+      "issued": "2026-06-17",
+      "url": "https://www.credly.com/badges/42080af4-364f-4dd9-95da-b77fb399f873",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-ibm-i-ready.png"
+    },
+    {
+      "id": "credly-0e80df0f-b77c-4329-8590-299f7dc659ed",
+      "name": "Bobathon Innovator",
+      "issued": "2026-05-29",
+      "url": "https://www.credly.com/badges/0e80df0f-b77c-4329-8590-299f7dc659ed",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-bobathon-innovator.png"
+    },
+    {
+      "id": "credly-58aef309-826a-4d1a-ad31-bef7f9c30102",
+      "name": "IBM Growth Behaviors",
+      "issued": "2026-05-12",
+      "url": "https://www.credly.com/badges/58aef309-826a-4d1a-ad31-bef7f9c30102",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-ibm-growth-behaviors.png"
+    },
+    {
+      "id": "credly-02215b92-84c0-4f6b-8174-5407939ddb84",
+      "name": "Retrieval-Augmented Generation for Enhanced AI Outputs",
+      "issued": "2026-01-29",
+      "url": "https://www.credly.com/badges/02215b92-84c0-4f6b-8174-5407939ddb84",
+      "issuer": "IBM SkillsBuild",
+      "source": "credly",
+      "image": "assets/badges/credly-retrieval-augmented-generation-for-enhanced-ai-out.png"
+    },
+    {
+      "id": "credly-2d3386b6-c75d-4a42-ba27-d29b025243ff",
+      "name": "AWS Educate Introduction to Generative AI - Training Badge",
+      "issued": "2026-01-28",
+      "url": "https://www.credly.com/badges/2d3386b6-c75d-4a42-ba27-d29b025243ff",
+      "issuer": "Amazon Web Services Training and Certification",
+      "source": "credly",
+      "image": "assets/badges/credly-aws-educate-introduction-to-generative-ai-training.png"
+    },
+    {
+      "id": "credly-185a34e5-70ee-4d97-93e0-62c770d3bc5b",
+      "name": "Trustworthy AI and AI Ethics",
+      "issued": "2026-01-28",
+      "url": "https://www.credly.com/badges/185a34e5-70ee-4d97-93e0-62c770d3bc5b",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-trustworthy-ai-and-ai-ethics.png"
+    },
+    {
+      "id": "credly-660acfdb-c816-4ae5-8311-1170db0e27a5",
+      "name": "Red Hat AI Foundations: Executive Skills Badge",
+      "issued": "2026-01-27",
+      "url": "https://www.credly.com/badges/660acfdb-c816-4ae5-8311-1170db0e27a5",
+      "issuer": "Red Hat",
+      "source": "credly",
+      "image": "assets/badges/credly-red-hat-ai-foundations-executive-skills-badge.png"
+    },
+    {
+      "id": "credly-25ac258d-2dc4-4f1a-bf28-a269296ff53a",
+      "name": "AWS Educate Machine Learning Foundations - Training Badge",
+      "issued": "2026-01-27",
+      "url": "https://www.credly.com/badges/25ac258d-2dc4-4f1a-bf28-a269296ff53a",
+      "issuer": "Amazon Web Services Training and Certification",
+      "source": "credly",
+      "image": "assets/badges/credly-aws-educate-machine-learning-foundations-training-.png"
+    },
+    {
+      "id": "credly-b7baa6c7-2797-43aa-9235-be1e0ac3da1c",
+      "name": "Chainguard AI/ML Guardian",
+      "issued": "2026-01-22",
+      "url": "https://www.credly.com/badges/b7baa6c7-2797-43aa-9235-be1e0ac3da1c",
+      "issuer": "Chainguard",
+      "source": "credly",
+      "image": "assets/badges/credly-chainguard-ai-ml-guardian.png"
+    },
+    {
+      "id": "credly-5cdd749f-f39e-4bd6-9464-0f4382c7e13b",
+      "name": "Data Fundamentals",
+      "issued": "2026-01-22",
+      "url": "https://www.credly.com/badges/5cdd749f-f39e-4bd6-9464-0f4382c7e13b",
+      "issuer": "IBM SkillsBuild",
+      "source": "credly",
+      "image": "assets/badges/credly-data-fundamentals.png"
+    },
+    {
+      "id": "credly-bd7c43ab-9785-4a8a-9fec-80d2ae3e84fb",
+      "name": "Application Security Engineer Learning Path",
+      "issued": "2026-01-22",
+      "url": "https://www.credly.com/badges/bd7c43ab-9785-4a8a-9fec-80d2ae3e84fb",
+      "issuer": "Datadog",
+      "source": "credly",
+      "image": "assets/badges/credly-application-security-engineer-learning-path.png"
+    },
+    {
+      "id": "credly-2120f349-8f58-4ab7-a918-9c0620b83b32",
+      "name": "NASA Open Science 101",
+      "issued": "2026-01-21",
+      "url": "https://www.credly.com/badges/2120f349-8f58-4ab7-a918-9c0620b83b32",
+      "issuer": "NASA Open Science",
+      "source": "credly",
+      "image": "assets/badges/credly-nasa-open-science-101.png"
+    },
+    {
+      "id": "credly-9caf48f3-05c5-4762-a5d9-197efb220714",
+      "name": "Interskill – IBM Mainframe Application Programmer – Java for COBOL Programmers - Fundamentals",
+      "issued": "2026-01-21",
+      "url": "https://www.credly.com/badges/9caf48f3-05c5-4762-a5d9-197efb220714",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-interskill-ibm-mainframe-application-programmer-ja.png"
+    },
+    {
+      "id": "credly-62ae0d9a-36db-4d13-96b6-ab70589862b1",
+      "name": "IBM Automation Practitioner",
+      "issued": "2026-01-21",
+      "url": "https://www.credly.com/badges/62ae0d9a-36db-4d13-96b6-ab70589862b1",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-ibm-automation-practitioner.png"
+    },
+    {
+      "id": "credly-382bd67a-a2b5-471c-b750-13074f80a266",
+      "name": "Artificial Intelligence Fundamentals",
+      "issued": "2026-01-20",
+      "url": "https://www.credly.com/badges/382bd67a-a2b5-471c-b750-13074f80a266",
+      "issuer": "IBM SkillsBuild",
+      "source": "credly",
+      "image": "assets/badges/credly-artificial-intelligence-fundamentals.png"
+    },
+    {
+      "id": "credly-de18bb38-3b24-4f53-bea2-179f2cdad4b4",
+      "name": "Enterprise Design Thinking Practitioner",
+      "issued": "2026-01-18",
+      "url": "https://www.credly.com/badges/de18bb38-3b24-4f53-bea2-179f2cdad4b4",
+      "issuer": "IBM SkillsBuild",
+      "source": "credly",
+      "image": "assets/badges/credly-enterprise-design-thinking-practitioner.png"
+    },
+    {
+      "id": "credly-68793860-dce6-4345-9609-10ef652db7b6",
+      "name": "IBM Garage Essentials",
+      "issued": "2026-01-18",
+      "url": "https://www.credly.com/badges/68793860-dce6-4345-9609-10ef652db7b6",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-ibm-garage-essentials.png"
+    },
+    {
+      "id": "credly-55eb87fc-9287-4424-a77d-4ed2f7d9bf55",
+      "name": "IBM Generative & Agentic AI Foundation",
+      "issued": "2026-01-16",
+      "url": "https://www.credly.com/badges/55eb87fc-9287-4424-a77d-4ed2f7d9bf55",
+      "issuer": "IBM",
+      "source": "credly",
+      "image": "assets/badges/credly-ibm-generative-agentic-ai-foundation.png"
+    },
+    {
+      "id": "credly-131bb33d-2c21-436a-ab73-45fae531c411",
+      "name": "McKinsey.org Forward Program",
+      "issued": "2025-12-10",
+      "url": "https://www.credly.com/badges/131bb33d-2c21-436a-ab73-45fae531c411",
+      "issuer": "McKinsey.org",
+      "source": "credly",
+      "image": "assets/badges/credly-mckinsey-org-forward-program.png"
+    },
+    {
+      "id": "credly-e83d64e4-596e-4764-ab4c-22dd744b211b",
+      "name": "Introduction to Cybersecurity",
+      "issued": "2024-12-15",
+      "url": "https://www.credly.com/badges/e83d64e4-596e-4764-ab4c-22dd744b211b",
+      "issuer": "Cisco",
+      "source": "credly",
+      "image": "assets/badges/credly-introduction-to-cybersecurity.png"
+    },
+    {
+      "id": "credly-a6ad0a44-7991-44cb-bacc-7e424289cb58",
+      "name": "Google Cloud Computing Foundations Certificate",
+      "issued": "2024-10-07",
+      "url": "https://www.credly.com/badges/a6ad0a44-7991-44cb-bacc-7e424289cb58",
+      "issuer": "Google Cloud",
+      "source": "credly",
+      "image": "assets/badges/credly-google-cloud-computing-foundations-certificate.png"
+    },
+    {
+      "id": "accredible-ad6ce575-dabf-4715-82f6-c5d442af8177",
+      "name": "BUS206: Management Information Systems",
+      "issued": "2022-03-28",
+      "url": "https://certificates.saylor.org/ad6ce575-dabf-4715-82f6-c5d442af8177",
+      "issuer": "Saylor University",
+      "source": "accredible",
+      "kind": "certificate",
+      "image": "assets/badges/accredible-bus206-management-information-systems.png"
+    }
+  ]
+}

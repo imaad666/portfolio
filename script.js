@@ -215,26 +215,13 @@
 
   document.addEventListener("DOMContentLoaded", loadGitHubContributions);
 
-  async function fetchBadgeSource(url) {
-    const response = await fetch(url);
-    const data = await response.json();
+  async function fetchBadgeManifest() {
+    const response = await fetch("/assets/badges/manifest.json");
     if (!response.ok) {
-      throw new Error(data.message || data.error || `Failed ${url}`);
+      throw new Error(`Failed to load badge manifest: ${response.status}`);
     }
-    return (data.badges || []).map((badge) => ({
-      ...badge,
-      source: badge.source || (url.includes("accredible") ? "accredible" : "credly"),
-    }));
-  }
-
-  function dedupeBadges(badges) {
-    const seen = new Set();
-    return badges.filter((badge) => {
-      const key = `${badge.name}|${badge.image}`.toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return Boolean(badge.image);
-    });
+    const manifest = await response.json();
+    return manifest.badges || [];
   }
 
   function formatBadgeDate(value) {
@@ -975,18 +962,10 @@
     if (!stack || !fallbackEl) return;
 
     try {
-      const results = await Promise.allSettled([
-        fetchBadgeSource("/api/credly-badges"),
-        fetchBadgeSource("/api/accredible-badges"),
-      ]);
-
-      const badges = dedupeBadges(
-        results.flatMap((result) => (result.status === "fulfilled" ? result.value : []))
-      ).sort((a, b) => new Date(b.issued || 0) - new Date(a.issued || 0));
+      const badges = await fetchBadgeManifest();
 
       if (!badges.length) {
-        const firstError = results.find((result) => result.status === "rejected");
-        throw firstError?.reason || new Error("No badges");
+        throw new Error("No badges in manifest");
       }
 
       renderBadgeDeck(badges);
